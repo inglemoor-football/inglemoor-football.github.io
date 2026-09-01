@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Announcements — Inglemoor Football</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0B0D;--panel:#14161A;--panel2:#1B1E24;--line:#2A2E36;--line2:#3A404A;
+  --gold:#F0B429;--gold-deep:#B07D0A;--bone:#F4F1E9;--mute:#8A929E;
+  --win:#5CB87F;--loss:#C4574B;
+  --display:'Big Shoulders Display',sans-serif;--body:'Barlow',system-ui,sans-serif;
+  --cond:'Barlow Condensed',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--body);
+  line-height:1.6;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:44px 24px 90px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,7vw,50px);
+  text-transform:uppercase;line-height:.95;margin:0 0 8px}
+.sub{color:var(--mute);margin:0 0 8px;font-size:16px}
+
+.card{background:var(--panel);border-top:2px solid var(--line2);padding:24px;margin-top:22px}
+.card.live{border-top-color:var(--gold)}
+.card h2{font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--mute);margin:0 0 14px}
+
+label{display:block;font-family:var(--cond);font-weight:700;font-size:13px;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--mute);margin:20px 0 8px}
+label:first-child{margin-top:0}
+input,textarea{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--bone);
+  font-family:var(--body);font-size:16px;padding:13px 15px;border-radius:0}
+input:focus,textarea:focus{border-color:var(--gold);outline:none}
+textarea{min-height:110px;resize:vertical;line-height:1.6}
+.row{display:grid;grid-template-columns:200px 1fr;gap:20px}
+@media(max-width:560px){.row{grid-template-columns:1fr;gap:0}}
+.hint{color:var(--mute);font-size:13.5px;margin:7px 0 0}
+
+.btn{font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.13em;
+  text-transform:uppercase;padding:13px 26px;border:1px solid var(--gold);
+  background:var(--gold);color:var(--ink);cursor:pointer;margin:0 8px 8px 0}
+.btn:hover:not(:disabled){background:#ffc63f;border-color:#ffc63f}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--bone);border-color:var(--line2)}
+.btn.ghost:hover:not(:disabled){border-color:var(--gold);color:var(--gold);background:transparent}
+.btn.ok{background:var(--win);border-color:var(--win);color:var(--ink)}
+
+.status{font-family:var(--cond);font-weight:600;font-size:14.5px;letter-spacing:.09em;
+  text-transform:uppercase;margin:14px 0 0;min-height:22px}
+.status.good{color:var(--win)} .status.bad{color:var(--loss)} .status.neutral{color:var(--mute)}
+
+.filechip{display:flex;align-items:center;gap:12px;background:var(--ink);
+  border:1px solid var(--line);padding:12px 15px;margin-bottom:16px}
+.filechip .dot{width:9px;height:9px;border-radius:50%;background:var(--win);flex-shrink:0}
+.filechip .dot.off{background:var(--line2)}
+.filechip span{font-family:var(--cond);font-weight:600;font-size:15px;letter-spacing:.06em}
+.filechip em{font-style:normal;color:var(--mute);margin-left:auto;font-size:13px}
+
+.entry{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;
+  padding:16px 0;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:none}
+.entry time{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px}
+.entry h3{font-family:var(--display);font-weight:700;font-size:21px;
+  text-transform:uppercase;margin:0 0 4px;line-height:1.1}
+.entry p{margin:0;color:var(--mute);font-size:14.5px}
+.entry.gone{opacity:.35}
+.entry.gone h3{text-decoration:line-through}
+.rm{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;background:transparent;border:1px solid var(--line2);
+  color:var(--mute);padding:7px 13px;cursor:pointer;white-space:nowrap}
+.rm:hover{border-color:var(--loss);color:var(--loss)}
+.rm.undo{border-color:var(--gold-deep);color:var(--gold)}
+
+pre{background:var(--ink);border:1px solid var(--line);padding:15px;margin:0;
+  overflow-x:auto;font-family:ui-monospace,Menlo,monospace;font-size:13px;
+  line-height:1.7;white-space:pre-wrap;word-break:break-word}
+
+details.help{margin-top:26px;background:var(--panel);padding:0}
+details.help summary{cursor:pointer;padding:18px 24px;font-family:var(--cond);
+  font-weight:700;font-size:13px;letter-spacing:.19em;text-transform:uppercase;color:var(--mute)}
+details.help summary:hover{color:var(--bone)}
+details.help .inner{padding:0 24px 24px;color:var(--mute);font-size:15px}
+details.help ol{padding-left:20px;margin:0}
+details.help li{margin-bottom:10px}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13px;
+  color:var(--gold);background:rgba(240,180,41,.09);padding:1px 6px}
+.warn{color:var(--loss);font-size:14px;margin:10px 0 0;min-height:20px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Announcements</h1>
+  <p class="sub">Open the site file, add or remove announcements, save. This tool never touches anything except the news list.</p>
+
+  <!-- STEP 1 -->
+  <div class="card live" id="connectCard">
+    <h2>The site file</h2>
+    <div class="filechip">
+      <span class="dot off" id="dot"></span>
+      <span id="fileName">Nothing open</span>
+      <em id="fileMeta"></em>
+    </div>
+    <button class="btn" id="openBtn">Open index.html</button>
+    <button class="btn ghost hidden" id="closeBtn">Close file</button>
+    <p class="status neutral" id="openStatus"></p>
+  </div>
+
+  <!-- EXISTING -->
+  <div class="card hidden" id="listCard">
+    <h2>On the site now</h2>
+    <div id="entries"></div>
+  </div>
+
+  <!-- ADD -->
+  <div class="card hidden" id="addCard">
+    <h2>Add an announcement</h2>
+    <div class="row">
+      <div>
+        <label for="d">Date</label>
+        <input type="date" id="d">
+      </div>
+      <div>
+        <label for="t">Headline</label>
+        <input type="text" id="t" placeholder="Parent meeting moved to Thursday" maxlength="90">
+      </div>
+    </div>
+    <label for="b">What people need to know</label>
+    <textarea id="b" placeholder="One or two sentences. What is happening, when, and where."></textarea>
+    <p class="hint">Plain text. Quotes and apostrophes are handled for you.</p>
+    <p class="warn" id="warn"></p>
+    <button class="btn ghost" id="addBtn">Add to the list</button>
+  </div>
+
+  <!-- SAVE -->
+  <div class="card hidden" id="saveCard">
+    <h2>Save</h2>
+    <p class="hint" id="pending" style="margin:0 0 16px"></p>
+    <button class="btn" id="saveBtn" disabled>Save to index.html</button>
+    <button class="btn ghost" id="dlBtn">Download a copy instead</button>
+    <p class="status neutral" id="saveStatus"></p>
+  </div>
+
+  <!-- FALLBACK -->
+  <div class="card hidden" id="fallbackCard">
+    <h2>Your browser can't edit files directly</h2>
+    <p class="hint" style="margin:0 0 16px">
+      Direct editing needs Chrome or Edge on a computer. On Safari, Firefox or a phone,
+      fill in the form and copy the line below into <code>index.html</code> yourself —
+      paste it just under the <code>NEWS:START</code> line.
+    </p>
+    <div class="row">
+      <div><label for="fd">Date</label><input type="date" id="fd"></div>
+      <div><label for="ft">Headline</label><input type="text" id="ft" maxlength="90"></div>
+    </div>
+    <label for="fb">What people need to know</label>
+    <textarea id="fb"></textarea>
+    <label>Copy this</label>
+    <pre id="fcode"></pre>
+    <button class="btn" id="fcopy">Copy to clipboard</button>
+  </div>
+
+  <details class="help">
+    <summary>Then what — getting it onto the website</summary>
+    <div class="inner">
+      <ol>
+        <li>Saving here changes the file on your computer. It is not online yet.</li>
+        <li>Open GitHub Desktop. It will show <code>index.html</code> as changed.</li>
+        <li>Type a short summary — "Add parent meeting notice" — and click <b>Commit to main</b>.</li>
+        <li>Click <b>Push origin</b>. GitHub Pages rebuilds in about a minute.</li>
+        <li>Reload the live site. Your announcement is there.</li>
+      </ol>
+      <p style="margin-top:16px">
+        Away from your computer? Go to the repo on github.com, open <code>index.html</code>,
+        click the pencil, paste your line under <code>NEWS:START</code>, and commit. Works on a phone.
+      </p>
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const START = "/* NEWS:START — do not delete this line */";
+  const END   = "/* NEWS:END — do not delete this line */";
+
+  const supported = typeof window.showOpenFilePicker === "function";
+
+  let handle = null;   // FileSystemFileHandle
+  let source = "";     // full text of index.html
+  let items  = [];     // [{date,title,body,removed}]
+  let dirty  = false;
+
+  /* ---------- helpers ---------- */
+  const esc = s => String(s)
+    .replace(/\\/g,"\\\\").replace(/"/g,'\\"')
+    .replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\r?\n/g," ").trim();
+
+  const unesc = s => String(s)
+    .replace(/\\"/g,'"').replace(/\\\\/g,"\\");
+
+  const pretty = iso => {
+    if (!iso) return "—";
+    const p = iso.split("-");
+    return MON[+p[1]-1] + " " + (+p[2]) + ", " + p[0];
+  };
+
+  const todayISO = () => {
+    const n = new Date();
+    return n.getFullYear() + "-" + String(n.getMonth()+1).padStart(2,"0") +
+           "-" + String(n.getDate()).padStart(2,"0");
+  };
+
+  function say(el, msg, kind){
+    el.textContent = msg;
+    el.className = "status " + (kind || "neutral");
+  }
+
+  /* ---------- parse / build the news block ---------- */
+  function parseBlock(text){
+    const a = text.indexOf(START), b = text.indexOf(END);
+    if (a === -1 || b === -1 || b < a) return null;
+    const inner = text.slice(a + START.length, b);
+    const re = /\{\s*date:\s*"([^"]*)"\s*,\s*title:\s*"((?:[^"\\]|\\.)*)"\s*,\s*body:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+    const out = []; let m;
+    while ((m = re.exec(inner)) !== null) {
+      out.push({ date:m[1], title:unesc(m[2]), body:unesc(m[3]), removed:false });
+    }
+    return out;
+  }
+
+  function buildBlock(list){
+    const keep = list.filter(x => !x.removed)
+      .slice().sort((a,b) => (b.date||"").localeCompare(a.date||""));
+    if (!keep.length) return "\n    ";
+    return "\n" + keep.map(n =>
+      '    { date:"' + n.date + '", title:"' + esc(n.title) + '",\n' +
+      '      body:"' + esc(n.body) + '" }'
+    ).join(",\n") + "\n    ";
+  }
+
+  function splice(text, list){
+    const a = text.indexOf(START), b = text.indexOf(END);
+    return text.slice(0, a + START.length) + buildBlock(list) + text.slice(b);
+  }
+
+  /* ---------- render ---------- */
+  function renderEntries(){
+    const el = $("#entries");
+    if (!items.length){
+      el.innerHTML = '<p class="hint" style="margin:0">Nothing posted yet. Add the first one below.</p>';
+    } else {
+      const sorted = items.slice().sort((a,b) => (b.date||"").localeCompare(a.date||""));
+      el.innerHTML = sorted.map(n => {
+        const k = items.indexOf(n);
+        return '<div class="entry' + (n.removed ? " gone" : "") + '">' +
+          '<div><time>' + pretty(n.date) + '</time>' +
+            '<h3></h3><p></p></div>' +
+          '<button class="rm' + (n.removed ? " undo" : "") + '" data-k="' + k + '">' +
+            (n.removed ? "Undo" : "Remove") + '</button>' +
+        '</div>';
+      }).join("");
+      // set text content separately so nothing is ever parsed as markup
+      el.querySelectorAll(".entry").forEach((row,ix) => {
+        row.querySelector("h3").textContent = sorted[ix].title;
+        row.querySelector("p").textContent  = sorted[ix].body;
+      });
+    }
+    const removed = items.filter(x => x.removed).length;
+    $("#pending").textContent = dirty
+      ? "Unsaved changes: " + items.filter(x => !x.removed).length + " showing" +
+        (removed ? ", " + removed + " to delete" : "") + "."
+      : "No changes to save.";
+    $("#saveBtn").disabled = !dirty;
+  }
+
+  /* ---------- open ---------- */
+  $("#openBtn").addEventListener("click", async () => {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types:[{ description:"The site file", accept:{ "text/html":[".html"] } }],
+        excludeAcceptAllOption:false, multiple:false
+      });
+      const file = await h.getFile();
+      const text = await file.text();
+      const parsed = parseBlock(text);
+
+      if (parsed === null){
+        say($("#openStatus"),
+          "That file has no news markers — did you pick index.html?", "bad");
+        return;
+      }
+
+      handle = h; source = text; items = parsed; dirty = false;
+      $("#dot").classList.remove("off");
+      $("#fileName").textContent = file.name;
+      $("#fileMeta").textContent = Math.round(file.size/1024) + " KB";
+      $("#openBtn").classList.add("hidden");
+      $("#closeBtn").classList.remove("hidden");
+      ["listCard","addCard","saveCard"].forEach(id => $("#"+id).classList.remove("hidden"));
+      say($("#openStatus"), "Found " + parsed.length + " announcement" + (parsed.length===1?"":"s") + ".", "good");
+      say($("#saveStatus"), "", "neutral");
+      renderEntries();
+    } catch(e){
+      if (e && e.name === "AbortError") return;      // user cancelled
+      say($("#openStatus"), "Could not open that file: " + (e.message||e), "bad");
+    }
+  });
+
+  $("#closeBtn").addEventListener("click", () => {
+    if (dirty && !confirm("You have unsaved changes. Close anyway?")) return;
+    handle = null; source = ""; items = []; dirty = false;
+    $("#dot").classList.add("off");
+    $("#fileName").textContent = "Nothing open";
+    $("#fileMeta").textContent = "";
+    $("#openBtn").classList.remove("hidden");
+    $("#closeBtn").classList.add("hidden");
+    ["listCard","addCard","saveCard"].forEach(id => $("#"+id).classList.add("hidden"));
+    say($("#openStatus"), "", "neutral");
+  });
+
+  /* ---------- remove / undo ---------- */
+  $("#entries").addEventListener("click", e => {
+    const b = e.target.closest(".rm"); if (!b) return;
+    const k = +b.dataset.k;
+    items[k].removed = !items[k].removed;
+    dirty = true;
+    renderEntries();
+    say($("#saveStatus"), "", "neutral");
+  });
+
+  /* ---------- add ---------- */
+  $("#d").value = todayISO();
+
+  function validate(d,t,b){
+    const w = [];
+    if (!d) w.push("Pick a date.");
+    if (!t) w.push("Add a headline.");
+    if (!b) w.push("Add the details.");
+    return w;
+  }
+
+  ["#d","#t","#b"].forEach(s => $(s).addEventListener("input", () => {
+    $("#warn").textContent = "";
+  }));
+
+  $("#addBtn").addEventListener("click", () => {
+    const d = $("#d").value, t = $("#t").value.trim(), b = $("#b").value.trim();
+    const w = validate(d,t,b);
+    if (w.length){ $("#warn").textContent = w.join(" "); return; }
+    items.push({ date:d, title:t, body:b, removed:false });
+    dirty = true;
+    $("#t").value = ""; $("#b").value = ""; $("#d").value = todayISO();
+    $("#warn").textContent = "";
+    renderEntries();
+    say($("#saveStatus"), "Added to the list — not saved yet.", "neutral");
+    $("#saveBtn").scrollIntoView({ behavior:"smooth", block:"center" });
+  });
+
+  /* ---------- save ---------- */
+  $("#saveBtn").addEventListener("click", async () => {
+    if (!handle) return;
+    try {
+      const updated = splice(source, items);
+      const w = await handle.createWritable();
+      await w.write(updated);
+      await w.close();
+      source = updated;
+      items = items.filter(x => !x.removed).map(x => Object.assign({}, x, { removed:false }));
+      dirty = false;
+      renderEntries();
+      say($("#saveStatus"), "Saved. Commit and push to put it live.", "good");
+      const btn = $("#saveBtn");
+      btn.textContent = "Saved"; btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = "Save to index.html"; btn.classList.remove("ok"); }, 2200);
+    } catch(e){
+      say($("#saveStatus"), "Save failed: " + (e.message||e) + " — try Download a copy instead.", "bad");
+    }
+  });
+
+  $("#dlBtn").addEventListener("click", () => {
+    if (!source) return;
+    const blob = new Blob([splice(source, items)], { type:"text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "index.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    say($("#saveStatus"), "Downloaded. Replace index.html in your repo folder with it.", "good");
+  });
+
+  window.addEventListener("beforeunload", e => {
+    if (dirty){ e.preventDefault(); e.returnValue = ""; }
+  });
+
+  /* ---------- fallback for browsers without the API ---------- */
+  if (!supported){
+    $("#connectCard").classList.add("hidden");
+    $("#fallbackCard").classList.remove("hidden");
+    $("#fd").value = todayISO();
+    const draw = () => {
+      $("#fcode").textContent =
+        '{ date:"' + ($("#fd").value||"") + '", title:"' + esc($("#ft").value) + '",\n' +
+        '  body:"' + esc($("#fb").value) + '" },';
+    };
+    ["#fd","#ft","#fb"].forEach(s => $(s).addEventListener("input", draw));
+    draw();
+    $("#fcopy").addEventListener("click", async function(){
+      try { await navigator.clipboard.writeText($("#fcode").textContent); }
+      catch(err){
+        const r = document.createRange(); r.selectNode($("#fcode"));
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        document.execCommand("copy"); sel.removeAllRanges();
+      }
+      this.textContent = "Copied"; this.classList.add("ok");
+      setTimeout(() => { this.textContent = "Copy to clipboard"; this.classList.remove("ok"); }, 1800);
+    });
+  }
+})();
+</script>
+</body>
+</html>

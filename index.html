@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Inglemoor Vikings Football — Kenmore, WA</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+<meta name="theme-color" content="#FEB72E">
 <meta name="description" content="Official site of Inglemoor High School Viking football and the IHS Viking Gridiron Booster Club. Schedule, game day info, registration, and how to support the program.">
 
 <!--
@@ -161,9 +164,9 @@ const SITE = {
      page — use "Varsity" or "C Team". Order here is the order
      shown, so reorder these lines to reorder the page.
 
-     "photo" is a headshot filename. Drop images into a
-     /coaches/ folder next to index.html and set e.g.
-     photo:"coaches/eubanks.jpg". Left empty, the card shows
+     "photo" is a headshot filename. Drop images into
+     images/coaches/ and set e.g.
+     photo:"images/coaches/eubanks.jpg". Left empty, the card shows
      the coach's initials instead — that is by design, not a
      broken image.
      --------------------------------------------------------- */
@@ -228,8 +231,8 @@ const SITE = {
      Three tiers: gold, silver, bronze. Each tier scrolls
      sideways, so you can add as many as you sell.
 
-     "logo" is an image filename — drop files into a /sponsors/
-     folder next to index.html and set logo:"sponsors/acme.png".
+     "logo" is an image filename — drop files into
+     images/sponsors/ and set logo:"images/sponsors/acme.png".
      Left empty, the tile shows the business name as text.
 
      These twelve are placeholders. Replace them as real
@@ -355,8 +358,8 @@ const SITE = {
   --panel2:#1B1E24;
   --line:#2A2E36;
   --line2:#3A404A;
-  --gold:#F0B429;
-  --gold-deep:#B07D0A;
+  --gold:#FEB72E;
+  --gold-deep:#BF8A23;
   --bone:#F4F1E9;
   --mute:#8A929E;
   --win:#5CB87F;
@@ -411,16 +414,8 @@ header{
 }
 .bar{display:flex;align-items:center;gap:26px;height:62px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none;flex-shrink:0}
-.shield{
-  width:26px;height:30px;flex-shrink:0;
-  background:var(--gold);
-  clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);
-  display:grid;place-items:center;
-}
-.shield span{
-  font-family:var(--display);font-weight:800;font-size:15px;
-  color:var(--ink);line-height:1;margin-bottom:5px;
-}
+.mark{height:36px;width:auto;flex-shrink:0;display:block}
+@media(max-width:560px){.mark{height:30px}}
 .brand b{
   font-family:var(--display);font-weight:800;font-size:20px;
   letter-spacing:.03em;text-transform:uppercase;line-height:1;
@@ -510,7 +505,7 @@ nav a:hover{color:var(--bone)}
   border:1px solid var(--gold);color:var(--ink);background:var(--gold);
   transition:.18s;display:inline-block;
 }
-.btn:hover{background:#ffc63f;border-color:#ffc63f}
+.btn:hover{background:#FFC754;border-color:#FFC754}
 .btn.ghost{background:transparent;color:var(--bone);border-color:var(--line2)}
 .btn.ghost:hover{border-color:var(--gold);color:var(--gold);background:transparent}
 
@@ -858,7 +853,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 <header>
   <div class="wrap bar">
     <a class="brand" href="#top">
-      <span class="shield"><span>V</span></span>
+      <img class="mark" src="images/viking-v.png" alt="Inglemoor Vikings"
+           onerror="this.style.display='none'">
       <b>Inglemoor Football</b>
     </a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
@@ -1039,7 +1035,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     <div class="fgrid">
       <div>
         <a class="brand" href="#top" style="margin-bottom:16px">
-          <span class="shield"><span>V</span></span>
+          <img class="mark" src="images/viking-v.png" alt="Inglemoor Vikings"
+               onerror="this.style.display='none'">
           <b>Inglemoor Football</b>
         </a>
         <p class="addr" id="footAddr"></p>
