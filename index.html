@@ -40,6 +40,23 @@
    ============================================================ */
 const SITE = {
 
+  /* ---- TEAM CALENDAR ---------------------------------------
+     Events come from the public Google Calendar, refreshed
+     into data/events.json three times a day by the
+     "Refresh calendar" GitHub Action. Nothing to edit here —
+     change the calendar in Google and the site follows.
+
+     To adjust how far ahead it looks, edit DAYS in
+     scripts/fetch_calendar.py.
+     --------------------------------------------------------- */
+  calendar: {
+    show: true,
+    feed: "data/events.json",
+    defaultView: "schedule",   // "schedule" or "month"
+    defaultDays: 7,            // days shown in the schedule view before "show all"
+    note: "Everything the team calendar holds — practices, dinners, and every game."
+  },
+
   /* ---- PREVIEW BANNER --------------------------------------
      Set show:false when the domain moves and the site goes
      public. That is the only change needed — the banner and
@@ -171,40 +188,40 @@ const SITE = {
      broken image.
      --------------------------------------------------------- */
   coaches: [
-    { team:"Varsity", first:"Jeremy", last:"Eubanks", photo:"",
+    { team:"Varsity", first:"Jeremy", last:"Eubanks", photo:"images/coaches/jeremy-eubanks.jpg",
       role:"Head Coach / Quarterback Coach",
       bio:"Coach Jeremy played at Kamiakin High School in Kennewick, helping lead his team to a 4A state runner-up finish as a senior. He spent ten years coaching flag football before joining the Inglemoor staff, where he worked with the running backs and later led the C-Team. His experience, leadership, and commitment to developing athletes ultimately led him to take over the varsity program as Head Coach and Quarterback Coach." },
-    { team:"Varsity", first:"Jeff", last:"Dick", photo:"",
+    { team:"Varsity", first:"Jeff", last:"Dick", photo:"images/coaches/jeff-dick.jpg",
       role:"Assistant Head Coach, Defensive Coordinator, Special Teams & Safeties",
       bio:"Coach Jeff has dedicated 15 years to Inglemoor Football, serving in a wide range of roles across the program. His experience includes C-Team Defensive Coordinator, DB Coach, and coaching both running backs and quarterbacks. He currently leads the varsity safeties and coordinates Special Teams. Prior to joining the high school staff, Coach Jeff spent four years with the IJF Football Program, where he also served as Player Safety Lead, ensuring proper instruction of blocking and tackling fundamentals." },
-    { team:"Varsity", first:"John", last:"Cowan", photo:"",
+    { team:"Varsity", first:"John", last:"Cowan", photo:"images/coaches/john-cowan.jpg",
       role:"Offensive Line Coach",
       bio:"Coach John brings ten years of coaching experience across baseball, basketball, and football. A three-year starting offensive lineman at Eastside Catholic, he now applies his playing experience and technical knowledge to developing Inglemoor’s offensive line. Off the field, he is an entrepreneur and real estate broker, bringing leadership and professionalism to the program." },
-    { team:"Varsity", first:"Trace", last:"Bartoli", photo:"",
+    { team:"Varsity", first:"Trace", last:"Bartoli", photo:"images/coaches/trace-bartoli.jpg",
       role:"Defensive Line Coach",
       bio:"Coach Trace returned to his alma mater in 2023, first coaching the C-Team offensive and defensive line before transitioning to the varsity defensive line role for the 2024 season. A former Viking standout, he led Inglemoor’s offensive and defensive line from 2003–2005 and earned a KingCo All-League selection as a senior captain. With 20 years of coaching experience at the high school, middle school, and junior levels, Coach Trace brings deep technical expertise and passion to the trenches. In 2023, he helped guide the C-Team to a perfect 9-0 season. A Kenmore native, he and his wife, Tori, are raising four children—Skylie, Oryan, Lucca, and Blake." },
-    { team:"Varsity", first:"Dylan", last:"Jacobi", photo:"",
+    { team:"Varsity", first:"Dylan", last:"Jacobi", photo:"images/coaches/dylan-jacobi.jpg",
       role:"Wide Receiver Coach",
       bio:"" },
-    { team:"Varsity", first:"DJ", last:"Schauman", photo:"",
+    { team:"Varsity", first:"DJ", last:"Schauman", photo:"images/coaches/dj-schauman.jpg",
       role:"Cornerback Coach",
       bio:"Coach DJ is an 18-year coaching veteran with a proven track record of developing athletes and building winning teams. He led 21 seasons of flag football—all with winning records and multiple championships—before transitioning to tackle football. Over four seasons at the tackle level, he has served as head coach, offensive coordinator, defensive coordinator, and defensive backs coach, bringing versatility and a high football IQ to every role. Off the field, Coach DJ builds custom homes throughout the greater Seattle area and is a dedicated family man, supported by his wife, Ebony, and their three sons—Domonick, Zachary, and Cooper." },
-    { team:"Varsity", first:"Sonny", last:"Alderman", photo:"",
+    { team:"Varsity", first:"Sonny", last:"Alderman", photo:"images/coaches/sonny-alderman.jpg",
       role:"Running Back / Linebacker Coach",
       bio:"Coach Sonny joined the Inglemoor staff in 2025 as the linebackers coach. After his playing career ended in high school, he began coaching youth football with the Ballard Knights, spending four years developing young athletes. He later coached LB/RB at Nathan Hale High School and served as JV Head Coach. Coach Sonny is driven by a mission to help players build confidence, grow as leaders, and learn meaningful life lessons through football." },
     { team:"Varsity", first:"Peyton", last:"Mrnsy", photo:"",
       role:"Volunteer",
       bio:"" },
-    { team:"C Team", first:"David", last:"Minerath", photo:"",
+    { team:"C Team", first:"David", last:"Minerath", photo:"images/coaches/david-minerath.jpg",
       role:"C Team Head Coach",
       bio:"Coach David grew up playing football in Northern Idaho at the junior, middle, and high school levels. He moved to Tacoma in 2012 to attend the University of Puget Sound, competing on the varsity rowing team and winning the 2013 NCRC Novice 8s Championship. After coaching junior tackle football with the Ballard Knights, he joined the Inglemoor staff in 2024 as the wide receivers coach before stepping into the role of C-Team Head Coach. His energy, teaching ability, and commitment to fundamentals make him a strong developer of young Viking athletes." },
-    { team:"C Team", first:"Rico", last:"Cruz", photo:"",
+    { team:"C Team", first:"Rico", last:"Cruz", photo:"images/coaches/rico-cruz.jpg",
       role:"C Team Assistant Coach",
       bio:"Coach Rico, 43, began his coaching journey with two years in flag football before moving into the Inglemoor Junior Football feeder program, where he spent four years developing players and gaining a strong understanding of the Inglemoor system. He is excited to continue growing within the high school program and contributing to the development of Viking athletes. Coach Rico is committed to creating a fun, positive, and meaningful learning experience for himself and every player he works with, building a strong foundation for future success." },
-    { team:"C Team", first:"Ethan", last:"Svendsen", photo:"",
+    { team:"C Team", first:"Ethan", last:"Svendsen", photo:"images/coaches/ethan-svendsen.jpg",
       role:"C Team Assistant Coach",
       bio:"Coach Ethan is entering his first season coaching the C-Team offensive line. A proud Inglemoor Viking and member of the Class of 2014, he played two seasons on the offensive and defensive line and also competed in basketball during his time at IHS. He currently serves as a School Counseling Intern in the Northshore School District. Before joining Northshore, Coach Ethan worked as a paraeducator and boys basketball coach at Finn Hill Middle School, gaining valuable experience supporting students both academically and athletically. He brings a strong commitment to mentorship, player development, and building a positive team culture for young Vikings." },
-    { team:"C Team", first:"Jacob", last:"Swenson", photo:"",
+    { team:"C Team", first:"Jacob", last:"Swenson", photo:"images/coaches/jacob-swenson.jpg",
       role:"C Team Assistant Coach",
       bio:"" }
   ],
@@ -624,6 +641,93 @@ nav a:hover{color:var(--bone)}
   .sponsor,.tier-gold .sponsor,.tier-bronze .sponsor{flex-basis:150px;min-height:92px}
 }
 
+/* ---------- team calendar ---------- */
+.calbar{display:flex;align-items:center;gap:12px;margin:0 0 20px;flex-wrap:wrap}
+.calviews{display:flex;gap:2px}
+.calviews button{font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.15em;
+  text-transform:uppercase;background:transparent;color:var(--mute);
+  border:1px solid var(--line2);padding:10px 22px;cursor:pointer;transition:.18s}
+.calviews button:hover{color:var(--bone);border-color:var(--gold-deep)}
+.calviews button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.calmore{margin-top:16px}
+.calfoot{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--line2);margin:18px 0 0}
+
+/* event colours, shared by both views */
+.k-game    { --ek:var(--gold); }
+.k-practice{ --ek:#7FA8C9; }
+.k-meal    { --ek:#8FBF7F; }
+.k-other   { --ek:var(--line2); }
+
+/* schedule view */
+.cal{display:grid;gap:14px}
+.calday{background:var(--panel);display:grid;grid-template-columns:100px 1fr;
+  border:1px solid var(--line);border-top:2px solid var(--line2)}
+.calday.istoday{border-top-color:var(--gold)}
+.caldate{padding:20px 14px;border-right:1px solid var(--line);text-align:center;
+  display:flex;flex-direction:column;justify-content:center}
+.caldate .dw{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold)}
+.caldate .dn{font-family:var(--display);font-weight:800;font-size:36px;line-height:1;margin:3px 0}
+.caldate .dm{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--mute)}
+.calitems{display:flex;flex-direction:column;justify-content:center}
+.calitem{display:grid;grid-template-columns:88px 1fr;gap:16px;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--line);border-left:3px solid var(--ek)}
+.calitem:last-child{border-bottom:none}
+.calitem .ct{font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--mute);white-space:nowrap}
+.calitem .cw{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.03em}
+.calitem.k-game .cw{color:var(--gold);font-weight:700}
+.calitem .cw em{display:block;font-style:normal;font-family:var(--body);font-weight:400;
+  font-size:13px;color:var(--mute);letter-spacing:0;margin-top:2px}
+
+/* month view */
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+.mtitle{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,30px);
+  text-transform:uppercase;line-height:1}
+.mnav{font-family:var(--cond);font-weight:700;font-size:17px;background:transparent;
+  border:1px solid var(--line2);color:var(--bone);padding:7px 17px;cursor:pointer;transition:.18s}
+.mnav:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+.mnav:disabled{opacity:.25;cursor:not-allowed}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.mdow{background:var(--ink);padding:9px 8px;text-align:center;
+  font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--mute)}
+.mcell{background:var(--panel);min-height:112px;padding:8px 8px 10px;position:relative}
+.mcell.out{background:var(--ink);opacity:.35}
+.mcell.past{opacity:.45}
+.mcell.istoday{box-shadow:inset 0 0 0 2px var(--gold)}
+.mnum{font-family:var(--cond);font-weight:700;font-size:14px;letter-spacing:.06em;color:var(--mute)}
+.mcell.istoday .mnum{color:var(--gold)}
+.mchips{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.mchip{font-family:var(--cond);font-weight:600;font-size:11.5px;letter-spacing:.02em;
+  line-height:1.3;color:var(--bone);background:var(--panel2);
+  border-left:3px solid var(--ek);padding:3px 6px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mchip b{color:var(--ek);font-weight:700}
+.mmore{font-family:var(--cond);font-weight:600;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--line2);padding-left:3px}
+.mkey{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px;
+  font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mute)}
+.kdot{width:9px;height:9px;background:var(--ek);display:inline-block;margin-left:12px}
+.mkey .kdot:first-child{margin-left:0}
+
+@media(max-width:760px){
+  .calday{grid-template-columns:74px 1fr}
+  .caldate{padding:14px 8px}
+  .caldate .dn{font-size:27px}
+  .calitem{grid-template-columns:1fr;gap:3px;padding:13px 15px}
+  .mcell{min-height:74px;padding:5px 4px 6px}
+  .mnum{font-size:12px}
+  .mchip{font-size:0;padding:0;height:5px;border-left:none;background:var(--ek);margin-bottom:2px}
+  .mchip b{font-size:0}
+  .mmore{font-size:9px}
+  .mdow{padding:7px 2px;font-size:10px;letter-spacing:.08em}
+}
+
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--line2);margin-bottom:10px}
@@ -860,6 +964,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav">
       <a href="#schedule">Schedule</a>
+      <a href="#calendar">Calendar</a>
       <a href="#archive">History</a>
       <a href="#roster">Roster</a>
       <a href="#coaches">Coaches</a>
@@ -914,6 +1019,17 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <p class="bigrec" id="recBig"></p>
         <ul class="splits" id="splits"></ul>
       </aside>
+    </div>
+  </section>
+
+  <!-- TEAM CALENDAR -->
+  <section id="calendar">
+    <div class="wrap">
+      <p class="eyebrow">Team calendar</p>
+      <h2 class="sec">What&rsquo;s on</h2>
+      <p class="lede" id="calLede"></p>
+      <div class="calbar" id="calBar"></div>
+      <div id="calMount"></div>
     </div>
   </section>
 
@@ -1246,6 +1362,193 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     : '<li><span>Regular season games</span><span>'+real.length+'</span></li>' +
       '<li><span>League games</span><span>'+real.filter(g=>g.league).length+'</span></li>' +
       '<li><span>Home games</span><span>'+real.filter(g=>g.home).length+'</span></li>';
+
+  /* ---- TEAM CALENDAR ---- */
+  (async function(){
+    const cal = SITE.calendar;
+    if (!cal || !cal.show){ const n=$("#calendar"); if(n) n.remove(); return; }
+
+    const mount = $("#calMount"), bar = $("#calBar");
+    const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const same = (a,b) => a.getFullYear()===b.getFullYear() &&
+                          a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+    const key = d => d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+
+    // classify purely on the title — the calendar is the only source here
+    function kindOf(t){
+      const s = t.toLowerCase();
+      if (/practice|lift|weight|conditioning/.test(s)) return "practice";
+      if (/dinner|meal|potluck|banquet/.test(s))       return "meal";
+      if (/game|scrimmage|jamboree/.test(s))           return "game";
+      return "other";
+    }
+
+    let feed = null;
+    try {
+      const r = await fetch(cal.feed, { cache:"no-store" });
+      if (r.ok) feed = await r.json();
+    } catch(e){ /* offline, or opened straight from disk */ }
+
+    if (!feed){
+      $("#calLede").textContent = cal.note || "";
+      mount.innerHTML = '<div class="empty"><h4>Calendar unavailable</h4>' +
+        '<p>Everything else on this page is unaffected. If it stays this way, check that ' +
+        'the <b>Refresh calendar</b> job ran under the Actions tab.</p></div>';
+      return;
+    }
+
+    const today = midnight(new Date());
+    const all = (feed.events||[])
+      .map(e => ({ when:new Date(e.start), allDay:!!e.allDay,
+                   what:e.title, where:e.location||"", kind:kindOf(e.title) }))
+      .filter(e => e.when >= today)
+      .sort((a,b) => a.when - b.when);
+
+    $("#calLede").textContent = cal.note || "";
+
+    if (!all.length){
+      mount.innerHTML = '<div class="empty"><h4>Nothing scheduled</h4>' +
+        '<p>The team calendar has no upcoming events.</p></div>';
+      return;
+    }
+
+    let view = cal.defaultView === "month" ? "month" : "schedule";
+    let expanded = false;
+    let monthCursor = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    /* ---------- schedule view ---------- */
+    function renderSchedule(){
+      const days = cal.defaultDays || 7;
+      const cutoff = new Date(today.getTime() + days*864e5);
+      const rows = expanded ? all : all.filter(e => e.when < cutoff);
+      const hidden = all.length - rows.length;
+
+      if (!rows.length){
+        mount.innerHTML = '<div class="empty"><h4>Nothing in the next ' + days + ' days</h4>' +
+          '<p>' + all.length + ' events are scheduled further out.</p>' +
+          '<button class="btn ghost calmore" data-more>Show everything</button></div>';
+        return;
+      }
+
+      const groups = [];
+      rows.forEach(it => {
+        const g = groups[groups.length-1];
+        if (g && same(g.when, it.when)) g.items.push(it);
+        else groups.push({ when:it.when, items:[it] });
+      });
+
+      const tomorrow = new Date(today.getTime()+864e5);
+      const label = d => same(d,today) ? "Today" : same(d,tomorrow) ? "Tomorrow" : DOW[d.getDay()];
+
+      mount.innerHTML = '<div class="cal">' + groups.map(g =>
+        '<div class="calday' + (same(g.when,today) ? " istoday" : "") + '">' +
+          '<div class="caldate">' +
+            '<span class="dw">' + label(g.when) + '</span>' +
+            '<span class="dn">' + g.when.getDate() + '</span>' +
+            '<span class="dm">' + MON[g.when.getMonth()] + '</span>' +
+          '</div>' +
+          '<div class="calitems">' + g.items.map(it =>
+            '<div class="calitem k-' + it.kind + '">' +
+              '<span class="ct">' + (it.allDay ? "All day" : fmtTime(it.when)) + '</span>' +
+              '<span class="cw">' + it.what +
+                (it.where ? '<em>' + it.where + '</em>' : '') + '</span>' +
+            '</div>').join("") +
+          '</div>' +
+        '</div>').join("") + '</div>' +
+        (hidden > 0
+          ? '<button class="btn ghost calmore" data-more>Show all ' + all.length + ' events</button>'
+          : (expanded ? '<button class="btn ghost calmore" data-more>Show next ' + days + ' days</button>' : '')) +
+        foot();
+    }
+
+    /* ---------- month view ---------- */
+    function renderMonth(){
+      const y = monthCursor.getFullYear(), m = monthCursor.getMonth();
+      const first = new Date(y, m, 1);
+      const start = new Date(y, m, 1 - first.getDay());          // back to Sunday
+      const last = new Date(y, m+1, 0);
+      const weeks = Math.ceil((first.getDay() + last.getDate()) / 7);
+
+      const byDay = {};
+      all.forEach(e => (byDay[key(e.when)] = byDay[key(e.when)] || []).push(e));
+
+      const limits = [];
+      const lo = new Date(today.getFullYear(), today.getMonth(), 1);
+      const hi = new Date(all[all.length-1].when.getFullYear(), all[all.length-1].when.getMonth(), 1);
+      limits.push(monthCursor > lo, monthCursor < hi);
+
+      let cells = "";
+      for (let i = 0; i < weeks*7; i++){
+        const d = new Date(start.getFullYear(), start.getMonth(), start.getDate()+i);
+        const out = d.getMonth() !== m;
+        const past = d < today;
+        const evs = byDay[key(d)] || [];
+        cells += '<div class="mcell' + (out ? " out" : "") + (past ? " past" : "") +
+                 (same(d,today) ? " istoday" : "") + '">' +
+          '<span class="mnum">' + d.getDate() + '</span>' +
+          (evs.length ? '<div class="mchips">' + evs.slice(0,3).map(e =>
+              '<span class="mchip k-' + e.kind + '" title="' +
+                (e.allDay ? "All day" : fmtTime(e.when)) + ' — ' + e.what + '">' +
+                (e.allDay ? "" : '<b>' + fmtTime(e.when).replace(/:00/,"").replace(/\s/g,"") + '</b> ') +
+                e.what + '</span>').join("") +
+            (evs.length > 3 ? '<span class="mmore">+' + (evs.length-3) + ' more</span>' : '') +
+            '</div>' : '') +
+        '</div>';
+      }
+
+      mount.innerHTML =
+        '<div class="mhead">' +
+          '<button class="mnav" data-mon="-1"' + (limits[0] ? "" : " disabled") + ' aria-label="Previous month">&larr;</button>' +
+          '<span class="mtitle">' + MONTHS[m] + ' ' + y + '</span>' +
+          '<button class="mnav" data-mon="1"' + (limits[1] ? "" : " disabled") + ' aria-label="Next month">&rarr;</button>' +
+        '</div>' +
+        '<div class="mgrid">' +
+          DOW.map(d => '<div class="mdow">' + d + '</div>').join("") +
+          cells +
+        '</div>' +
+        '<div class="mkey">' +
+          '<span class="kdot k-game"></span>Game' +
+          '<span class="kdot k-practice"></span>Practice' +
+          '<span class="kdot k-meal"></span>Team meal' +
+        '</div>' + foot();
+    }
+
+    function foot(){
+      return feed.updated
+        ? '<p class="calfoot">Updated ' +
+          new Date(feed.updated).toLocaleDateString(undefined,{month:"short",day:"numeric"}) +
+          ' at ' + fmtTime(new Date(feed.updated)) + ' &middot; ' + all.length + ' upcoming</p>'
+        : "";
+    }
+
+    const MONTHS = ["January","February","March","April","May","June",
+                    "July","August","September","October","November","December"];
+
+    function draw(){
+      bar.innerHTML =
+        '<div class="calviews" role="group" aria-label="Calendar view">' +
+          '<button data-view="schedule" aria-pressed="' + (view==="schedule") + '">Schedule</button>' +
+          '<button data-view="month" aria-pressed="' + (view==="month") + '">Month</button>' +
+        '</div>';
+      if (view === "schedule") renderSchedule(); else renderMonth();
+    }
+
+    bar.addEventListener("click", e => {
+      const b = e.target.closest("[data-view]"); if (!b) return;
+      view = b.dataset.view; draw();
+    });
+    mount.addEventListener("click", e => {
+      if (e.target.closest("[data-more]")){ expanded = !expanded; draw(); return; }
+      const n = e.target.closest("[data-mon]");
+      if (n && !n.disabled){
+        monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + (+n.dataset.mon), 1);
+        draw();
+      }
+    });
+
+    draw();
+  })();
 
   /* ---- NEWS ---- */
   const newsSorted = (SITE.news||[]).slice().sort((a,b) => (b.date||"").localeCompare(a.date||""));
