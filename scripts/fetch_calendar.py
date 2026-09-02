@@ -178,6 +178,17 @@ def main():
         json.dump(payload, f, indent=1, ensure_ascii=False)
         f.write("\n")
 
+    # GitHub disables scheduled workflows in public repos after 60 days
+    # with no repository activity. Writing this once a week counts as
+    # activity, so the refresh keeps running through the off-season.
+    year, week, _ = dt.date.today().isocalendar()
+    beat = os.path.join(os.path.dirname(OUT), "heartbeat.txt")
+    stamp = f"{year}-W{week:02d}\n"
+    if not os.path.exists(beat) or open(beat).read() != stamp:
+        with open(beat, "w") as f:
+            f.write(stamp)
+        print(f"Heartbeat set to {stamp.strip()}")
+
     print(f"Wrote {len(clean)} events to {OUT}")
     for r in clean[:10]:
         print("   ", r["start"][:16].replace("T", "  "), r["title"][:44])

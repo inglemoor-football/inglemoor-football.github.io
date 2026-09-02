@@ -6,10 +6,9 @@ name: Refresh calendar
 
 on:
   schedule:
-    # 06:10, 12:10 and 18:10 Pacific (UTC is 7 or 8 hours ahead)
-    - cron: "10 13 * * *"
-    - cron: "10 19 * * *"
-    - cron: "10 1 * * *"
+    # Hourly at :17. Not :00 — that is the busiest slot and GitHub
+    # can delay scheduled runs by up to 15 minutes under load.
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -34,12 +33,12 @@ jobs:
 
       - name: Commit if anything changed
         run: |
-          if git diff --quiet -- data/events.json; then
-            echo "No calendar changes."
+          if git diff --quiet -- data/; then
+            echo "Nothing changed."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/events.json
+          git add data/
           git commit -m "Update calendar"
           git push

@@ -53,7 +53,7 @@ const SITE = {
     show: true,
     feed: "data/events.json",
     defaultView: "schedule",   // "schedule" or "month"
-    defaultDays: 7,            // days shown in the schedule view before "show all"
+    visibleDays: 7,            // roughly how many days are visible before scrolling
     note: "Everything the team calendar holds — practices, dinners, and every game."
   },
 
@@ -649,7 +649,14 @@ nav a:hover{color:var(--bone)}
   border:1px solid var(--line2);padding:10px 22px;cursor:pointer;transition:.18s}
 .calviews button:hover{color:var(--bone);border-color:var(--gold-deep)}
 .calviews button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
-.calmore{margin-top:16px}
+.calscroll{position:relative;overflow:visible}
+.calscroll.scrolls{overflow-y:auto;padding-right:10px;
+  scrollbar-width:thin;scrollbar-color:var(--line2) transparent;
+  -webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 46px),transparent);
+          mask-image:linear-gradient(180deg,#000 calc(100% - 46px),transparent)}
+.calscroll.scrolls::-webkit-scrollbar{width:7px}
+.calscroll.scrolls::-webkit-scrollbar-thumb{background:var(--line2)}
+.calscroll.scrolls::-webkit-scrollbar-track{background:var(--panel)}
 .calfoot{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--line2);margin:18px 0 0}
 
@@ -1414,25 +1421,12 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     }
 
     let view = cal.defaultView === "month" ? "month" : "schedule";
-    let expanded = false;
     let monthCursor = new Date(today.getFullYear(), today.getMonth(), 1);
 
     /* ---------- schedule view ---------- */
     function renderSchedule(){
-      const days = cal.defaultDays || 7;
-      const cutoff = new Date(today.getTime() + days*864e5);
-      const rows = expanded ? all : all.filter(e => e.when < cutoff);
-      const hidden = all.length - rows.length;
-
-      if (!rows.length){
-        mount.innerHTML = '<div class="empty"><h4>Nothing in the next ' + days + ' days</h4>' +
-          '<p>' + all.length + ' events are scheduled further out.</p>' +
-          '<button class="btn ghost calmore" data-more>Show everything</button></div>';
-        return;
-      }
-
       const groups = [];
-      rows.forEach(it => {
+      all.forEach(it => {
         const g = groups[groups.length-1];
         if (g && same(g.when, it.when)) g.items.push(it);
         else groups.push({ when:it.when, items:[it] });
@@ -1441,25 +1435,33 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       const tomorrow = new Date(today.getTime()+864e5);
       const label = d => same(d,today) ? "Today" : same(d,tomorrow) ? "Tomorrow" : DOW[d.getDay()];
 
-      mount.innerHTML = '<div class="cal">' + groups.map(g =>
-        '<div class="calday' + (same(g.when,today) ? " istoday" : "") + '">' +
-          '<div class="caldate">' +
-            '<span class="dw">' + label(g.when) + '</span>' +
-            '<span class="dn">' + g.when.getDate() + '</span>' +
-            '<span class="dm">' + MON[g.when.getMonth()] + '</span>' +
-          '</div>' +
-          '<div class="calitems">' + g.items.map(it =>
-            '<div class="calitem k-' + it.kind + '">' +
-              '<span class="ct">' + (it.allDay ? "All day" : fmtTime(it.when)) + '</span>' +
-              '<span class="cw">' + it.what +
-                (it.where ? '<em>' + it.where + '</em>' : '') + '</span>' +
-            '</div>').join("") +
-          '</div>' +
-        '</div>').join("") + '</div>' +
-        (hidden > 0
-          ? '<button class="btn ghost calmore" data-more>Show all ' + all.length + ' events</button>'
-          : (expanded ? '<button class="btn ghost calmore" data-more>Show next ' + days + ' days</button>' : '')) +
-        foot();
+      mount.innerHTML =
+        '<div class="calscroll" id="calScroll"><div class="cal">' + groups.map(g =>
+          '<div class="calday' + (same(g.when,today) ? " istoday" : "") + '">' +
+            '<div class="caldate">' +
+              '<span class="dw">' + label(g.when) + '</span>' +
+              '<span class="dn">' + g.when.getDate() + '</span>' +
+              '<span class="dm">' + MON[g.when.getMonth()] + '</span>' +
+            '</div>' +
+            '<div class="calitems">' + g.items.map(it =>
+              '<div class="calitem k-' + it.kind + '">' +
+                '<span class="ct">' + (it.allDay ? "All day" : fmtTime(it.when)) + '</span>' +
+                '<span class="cw">' + it.what +
+                  (it.where ? '<em>' + it.where + '</em>' : '') + '</span>' +
+              '</div>').join("") +
+            '</div>' +
+          '</div>').join("") + '</div></div>' + foot();
+
+      // size the box to about visibleDays worth of rows, then let it scroll
+      const box = $("#calScroll");
+      const want = cal.visibleDays || 7;
+      const cards = box.querySelectorAll(".calday");
+      if (cards.length > want){
+        let h = 0;
+        for (let i = 0; i < want; i++) h += cards[i].offsetHeight + 14;
+        box.style.maxHeight = Math.round(h - 7) + "px";
+        box.classList.add("scrolls");
+      }
     }
 
     /* ---------- month view ---------- */
@@ -1539,7 +1541,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       view = b.dataset.view; draw();
     });
     mount.addEventListener("click", e => {
-      if (e.target.closest("[data-more]")){ expanded = !expanded; draw(); return; }
       const n = e.target.closest("[data-mon]");
       if (n && !n.disabled){
         monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + (+n.dataset.mon), 1);
