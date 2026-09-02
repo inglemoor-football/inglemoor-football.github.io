@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-02T01:46:14-07:00",
+ "updated": "2026-09-02T06:38:34-07:00",
  "windowDays": 180,
  "events": [
   {
@@ -137,14 +137,14 @@
   {
    "start": "2026-09-23T16:00:00-07:00",
    "allDay": false,
-   "title": "C-Team game at Mercer Island",
-   "location": "Mercer Island High School, 9100 SE 42nd St, Mercer Island, WA 98040, USA"
+   "title": "Team Practice",
+   "location": ""
   },
   {
    "start": "2026-09-23T16:00:00-07:00",
    "allDay": false,
-   "title": "Team Practice",
-   "location": ""
+   "title": "C-Team game at Mercer Island",
+   "location": "Mercer Island High School, 9100 SE 42nd St, Mercer Island, WA 98040, USA"
   },
   {
    "start": "2026-09-24T16:00:00-07:00",
