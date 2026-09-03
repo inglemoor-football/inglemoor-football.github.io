@@ -19,10 +19,9 @@
 
    Add a score .... find the game in SITE.schedule, add
                     us: 28, them: 14
-   Add a player ... add a line to SITE.roster
+   Team photo ..... set teamPhoto to the image path
    Add a sponsor .. add a line to SITE.sponsors
    Change a coach . edit SITE.coaches
-   Post news ...... add a line to SITE.news
 
   The page works out the rest on its own: which game is next,
   the countdown, the win-loss record, home/away splits, and
@@ -77,6 +76,11 @@ const SITE = {
     season:   2026
   },
 
+  // Action shot beside the countdown. Leave empty and nothing renders —
+  // no gap, no broken image. Drop a file into images/ and set it here,
+  // e.g. heroImage:"images/hero.jpg". A wide crop works best.
+  heroImage: "",
+
   // Where home games are played.
   homeField: {
     name: "Pop Keeney Stadium",
@@ -92,6 +96,7 @@ const SITE = {
     maxpreps: "https://www.maxpreps.com/wa/kenmore/inglemoor-vikings/football/",
     register: "https://inglemoor.nsd.org/athletics",
     instagram:"https://www.instagram.com/inglemoorfootball/",
+    facebook: "https://www.facebook.com/ihsvikingfootballboosters/",
     juniors:  "https://www.inglemoorvikings.org/",
     donate:   "https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055",
     store:    "https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop"
@@ -169,12 +174,10 @@ const SITE = {
       ]}
   ],
 
-  /* ---- ROSTER ---------------------------------------------
-     Leave empty until the roster is final; the page shows a
-     tidy placeholder instead of an empty gap.
-       { no:7, name:"Last, First", pos:"QB", yr:12, ht:"6-1", wt:185 }
-     --------------------------------------------------------- */
-  roster: [],
+  // The 2026 team photo, varsity and JV together. Drop the file into
+  // images/ and set the path here, e.g. "images/team-2026.jpg".
+  // Left empty, the section shows a tidy placeholder instead.
+  teamPhoto: "",
 
   /* ---- COACHES --------------------------------------------
      Mirrors IHS_Coaches_List.xlsx. "team" groups them on the
@@ -209,39 +212,18 @@ const SITE = {
     { team:"Varsity", first:"Sonny", last:"Alderman", photo:"images/coaches/sonny-alderman.jpg",
       role:"Running Back / Linebacker Coach",
       bio:"Coach Sonny joined the Inglemoor staff in 2025 as the linebackers coach. After his playing career ended in high school, he began coaching youth football with the Ballard Knights, spending four years developing young athletes. He later coached LB/RB at Nathan Hale High School and served as JV Head Coach. Coach Sonny is driven by a mission to help players build confidence, grow as leaders, and learn meaningful life lessons through football." },
-    { team:"Varsity", first:"Peyton", last:"Mrnsy", photo:"",
-      role:"Volunteer",
-      bio:"" },
     { team:"C Team", first:"David", last:"Minerath", photo:"images/coaches/david-minerath.jpg",
       role:"C Team Head Coach",
       bio:"Coach David grew up playing football in Northern Idaho at the junior, middle, and high school levels. He moved to Tacoma in 2012 to attend the University of Puget Sound, competing on the varsity rowing team and winning the 2013 NCRC Novice 8s Championship. After coaching junior tackle football with the Ballard Knights, he joined the Inglemoor staff in 2024 as the wide receivers coach before stepping into the role of C-Team Head Coach. His energy, teaching ability, and commitment to fundamentals make him a strong developer of young Viking athletes." },
     { team:"C Team", first:"Rico", last:"Cruz", photo:"images/coaches/rico-cruz.jpg",
       role:"C Team Assistant Coach",
-      bio:"Coach Rico, 43, began his coaching journey with two years in flag football before moving into the Inglemoor Junior Football feeder program, where he spent four years developing players and gaining a strong understanding of the Inglemoor system. He is excited to continue growing within the high school program and contributing to the development of Viking athletes. Coach Rico is committed to creating a fun, positive, and meaningful learning experience for himself and every player he works with, building a strong foundation for future success." },
+      bio:"Coach Rico began his coaching journey with two years in flag football before moving into the Inglemoor Junior Football feeder program, where he spent four years developing players and gaining a strong understanding of the Inglemoor system. He is excited to continue growing within the high school program and contributing to the development of Viking athletes. Coach Rico is committed to creating a fun, positive, and meaningful learning experience for himself and every player he works with, building a strong foundation for future success." },
     { team:"C Team", first:"Ethan", last:"Svendsen", photo:"images/coaches/ethan-svendsen.jpg",
       role:"C Team Assistant Coach",
       bio:"Coach Ethan is entering his first season coaching the C-Team offensive line. A proud Inglemoor Viking and member of the Class of 2014, he played two seasons on the offensive and defensive line and also competed in basketball during his time at IHS. He currently serves as a School Counseling Intern in the Northshore School District. Before joining Northshore, Coach Ethan worked as a paraeducator and boys basketball coach at Finn Hill Middle School, gaining valuable experience supporting students both academically and athletically. He brings a strong commitment to mentorship, player development, and building a positive team culture for young Vikings." },
     { team:"C Team", first:"Jacob", last:"Swenson", photo:"images/coaches/jacob-swenson.jpg",
       role:"C Team Assistant Coach",
       bio:"" }
-  ],
-
-  /* ---- NEWS -----------------------------------------------
-     Managed by post-news.html — open that file, type, click
-     "Add to site." It rewrites everything between the two
-     NEWS markers below.
-
-     You can also hand-edit these lines. Just leave the two
-     marker comments alone; the tool needs them to find its
-     place. Order does not matter — the site sorts by date.
-     --------------------------------------------------------- */
-  news: [
-    /* NEWS:START — do not delete this line */
-    { date:"2026-08-20", title:"Fall camp is open",
-      body:"Practice runs through the season opener. Bring a full water bottle and cleats to every session." },
-    { date:"2026-08-20", title:"Parent meeting — September 2, 7:00 PM",
-      body:"Mandatory for every football family. Concert Hall at Inglemoor High School. Booster dues, volunteer sign-ups and the season calendar all get covered." }
-    /* NEWS:END — do not delete this line */
   ],
 
   /* ---- SPONSORS -------------------------------------------
@@ -265,44 +247,49 @@ const SITE = {
     { name:"Silver 3",                       tier:"silver", logo:"", url:"" },
     { name:"Silver 4",                       tier:"silver", logo:"", url:"" },
     { name:"The Pizza Coop & Ale House",     tier:"bronze", logo:"images/sponsors/pizza-coop.png",   url:"" },
-    { name:"Bronze 2",                       tier:"bronze", logo:"", url:"" },
-    { name:"Bronze 3",                       tier:"bronze", logo:"", url:"" },
-    { name:"Bronze 4",                       tier:"bronze", logo:"", url:"" }
+    { name:"Community 2",                       tier:"bronze", logo:"", url:"" },
+    { name:"Community 3",                       tier:"bronze", logo:"", url:"" },
+    { name:"Community 4",                       tier:"bronze", logo:"", url:"" }
   ],
 
   // Tier labels and blurbs shown above each row.
   tiers: [
     { key:"gold",   label:"Gold",   note:"Top-level partners" },
     { key:"silver", label:"Silver", note:"" },
-    { key:"bronze", label:"Bronze", note:"" }
+    { key:"bronze", label:"Community", note:"" }
   ],
 
-  /* ---- SUPPORT ---------------------------------------------
-     The Zeffy pages, shown as cards in the Boosters section.
-     An item can have one "url", or a "links" array when there
-     is more than one place to go (spirit wear has two stores).
-     Set featured:true on the one to highlight in gold.
+  /* ---- DONATE & FEES ---------------------------------------
+     The Zeffy pages. An item can carry one "url", or a "links"
+     array when there is more than one place to go.
      --------------------------------------------------------- */
   support: [
     { t:"Pay booster dues",
-      d:"Separate from the school's athletic fee. Dues are what actually fund the program — film, meals, gear and travel. Pay in the spring to spread the cost out.",
+      d:"Separate from the school's athletic fee. Dues are what actually fund the program — film, meals, gear and travel. Paying in the spring spreads the cost out before the school's fee comes due in the fall.",
       url:"https://www.zeffy.com/en-US/ticketing/2026-booster-dues-2",
-      cta:"Pay dues",
-      featured:true },
+      cta:"Pay dues" },
 
     { t:"Donate to the boosters",
-      d:"Any amount, any time. We are a registered 501(c)(3), so your gift is tax-deductible. Ask your employer about matching — many local companies do.",
+      d:"Any amount, any time. We are a registered 501(c)(3), so your gift is tax-deductible. Ask your employer about matching — a lot of local companies do it and most people never think to check.",
       url:"https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055",
       cta:"Donate" },
 
     { t:"Buy spirit wear",
-      d:"Viking gear for players, parents and the student section. Every purchase goes back to the team.",
+      d:"Viking gear for players, parents and the student section. Two stores, and every purchase goes back to the team.",
       links:[
-        { label:"Booster shop", url:"https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop" }
-        // Second store goes here when you have the link:
-        // { label:"Team gear", url:"https://..." }
+        { label:"Booster shop", url:"https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop" },
+        { label:"Team gear",    url:"https://inglemoorvikingsfootball.fusion-brands.com/" }
       ]}
   ],
+
+  /* ---- VOLUNTEER ------------------------------------------- */
+  volunteer: {
+    show: true,
+    lede: "Viking football runs on parents. Chains and downs, the concession stand, team dinners, filming, and setting up before kickoff — none of it happens without people signing up.",
+    body: "You do not need to know football, and you do not need to commit to a season. Take one shift, see how it goes. Most people end up taking another. It is also the fastest way to meet the other families and to actually see your player's season up close.",
+    url: "https://www.signupgenius.com/go/70A0D49AFA628AAF94-62398519-season#/",
+    cta: "See open shifts"
+  },
 
   boosters: {
     legalName: "IHS Viking Gridiron Booster Club",
@@ -317,7 +304,7 @@ const SITE = {
       { role:"Treasurer",                            name:"Lori Larsen",               year:"2029" },
       { role:"Social Media & Communications",        name:"Hedi Cowan",                year:"2027 & 2029" },
       { role:"Volunteer Coordinator",                name:"Shelly Holt",               year:"2027" },
-      { role:"Spiritwear",                           name:"Graham & Chrystal Comley",  year:"2029" },
+      { role:"Spiritwear & Website",                 name:"Graham & Chrystal Comley",  year:"2029" },
       { role:"Team Meals",                           name:"Tori Neiborsky",            year:"2027" }
     ],
 
@@ -331,32 +318,8 @@ const SITE = {
   },
 
   registration: {
-    opens: "Registration opens May 1 each year and runs through FinalForms. Your information carries over season to season, so it is quick after the first time.",
-    steps: [
-      { t:"Register on FinalForms",
-        d:"Create a parent account, add your student, and pick football. Every form needs a parent signature; some also need the student's. You will need basic medical history, insurance policy number, doctor and dentist contacts, and your hospital preference." },
-      { t:"Buy an ASB sticker",
-        d:"Required for every student playing a high school sport. ASB money goes straight back into athletics — facilities, equipment, uniforms and game transportation." },
-      { t:"Pay the athletic fee",
-        d:"$200 per sport, paid online through TouchBase, due before the first scheduled game. There is one football fee per year — spring ball is not charged separately. Email the school bookkeeper if you have multiple players or need a payment plan." },
-      { t:"Pay booster dues",
-        d:"Separate from the school fee, and this is what actually funds the program. Pay in the spring if you can — it spreads the cost out before the school's fee comes due in the fall." }
-    ],
-    eligibility: [
-      "Passed at least five classes last semester and currently enrolled in and passing at least five (WIAA rule).",
-      "Minimum 2.0 GPA — a Northshore School District requirement on top of the WIAA standard.",
-      "No outstanding school fines or fees.",
-      "Attend at least half your classes on any day you practice or play."
-    ],
-    footnote: "Fees do not guarantee a roster spot, playing time, or a letter award."
+    opens: "Registration opens May 1 each year and runs through FinalForms. Your information carries over season to season, so it is quick after the first time. You will also need an ASB sticker and the $200 athletic fee, both handled through the school."
   },
-
-  gameday: [
-    { t:"Tickets", d:"Football is a ticketed sport. Buy through GoFan before you leave the house — the gate line moves slowly and phones are the only accepted form at the door." },
-    { t:"Getting there", d:"Home games are at Pop Keeney in downtown Bothell, not on campus. The lot fills up about forty minutes before kickoff; street parking north of the stadium is usually open." },
-    { t:"Can't make it", d:"Every varsity game is streamed on the NFHS Network. Live scoring and stats post to MaxPreps during the game." },
-    { t:"Bring", d:"Cash for the booster concession stand, a seat cushion for the aluminum, and a rain layer. It is October in the Puget Sound." }
-  ],
 
   contact: {
     email: "ihsvikingfootball@gmail.com",
@@ -437,31 +400,31 @@ header{
   font-family:var(--display);font-weight:800;font-size:20px;
   letter-spacing:.03em;text-transform:uppercase;line-height:1;
 }
-nav{display:flex;gap:22px;margin-left:auto;align-items:center}
+nav{display:flex;gap:19px;margin-left:auto;align-items:center}
 nav a{
   font-family:var(--cond);font-weight:600;font-size:15px;
   letter-spacing:.09em;text-transform:uppercase;
   text-decoration:none;color:var(--mute);transition:color .18s;
 }
 nav a:hover{color:var(--bone)}
-.recchip{
-  font-family:var(--cond);font-weight:700;font-size:14px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--gold);
-  border:1px solid var(--gold-deep);border-radius:3px;padding:4px 11px;
-  white-space:nowrap;
-}
+nav a.navgold{color:var(--gold)}
+nav a.navgold:hover{color:#FFC754}
+.social{display:flex;gap:12px;align-items:center;margin-left:4px}
+.social a{color:var(--mute);display:grid;place-items:center;transition:color .18s}
+.social a:hover{color:var(--gold)}
 .menu-btn{display:none;background:none;border:1px solid var(--line2);color:var(--bone);
   border-radius:4px;padding:7px 12px;font-family:var(--cond);font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;font-size:13px;cursor:pointer;margin-left:auto}
 
-@media(max-width:900px){
+@media(max-width:1080px){
   nav{position:fixed;inset:62px 0 auto 0;flex-direction:column;align-items:stretch;
     gap:0;background:var(--ink);border-bottom:1px solid var(--line);
     padding:8px 0 18px;display:none}
   nav.open{display:flex}
   nav a{padding:14px var(--pad);font-size:19px;color:var(--bone);border-bottom:1px solid var(--line)}
   .menu-btn{display:block}
-  .recchip{display:none}
+  .social{padding:14px var(--pad);margin:0;gap:20px}
+  .social a{color:var(--bone)}
 }
 
 /* ---------- HERO / marquee ---------- */
@@ -473,6 +436,18 @@ nav a:hover{color:var(--bone)}
   mask-image:linear-gradient(180deg,#000,transparent 78%);
 }
 .hero .wrap{position:relative}
+.herogrid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
+.hcol-b{display:flex;flex-direction:column;justify-content:center;gap:0}
+.hcol-b .gamefacts{flex-direction:column;gap:7px;align-items:flex-start;
+  padding-left:20px;border-left:2px solid var(--gold);margin-bottom:30px}
+/* the action shot, once there is one, runs full width beneath both columns */
+.herogrid:has(.heroshot img) .heroshot{grid-column:1/-1;margin-top:12px}
+.heroshot img{width:100%;aspect-ratio:21/9;object-fit:cover;
+  border:1px solid var(--line);border-top:2px solid var(--gold)}
+@media(max-width:900px){
+  .herogrid{grid-template-columns:1fr;gap:30px}
+  .hcol-b .gamefacts{margin-bottom:26px}
+}
 .week{
   font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.24em;
   text-transform:uppercase;color:var(--gold);margin-bottom:26px;
@@ -493,7 +468,7 @@ nav a:hover{color:var(--bone)}
 .matchup .them{display:block;font-size:clamp(38px,8.4vw,100px);color:var(--bone)}
 
 .gamefacts{
-  display:flex;flex-wrap:wrap;gap:10px 30px;margin:0 0 30px;
+  display:flex;flex-wrap:wrap;gap:10px 30px;margin:0;
   font-family:var(--cond);font-weight:600;font-size:clamp(16px,2vw,19px);
   letter-spacing:.08em;text-transform:uppercase;color:var(--bone);
 }
@@ -701,12 +676,12 @@ nav a:hover{color:var(--bone)}
   border:1px solid var(--line2);color:var(--bone);padding:7px 17px;cursor:pointer;transition:.18s}
 .mnav:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
 .mnav:disabled{opacity:.25;cursor:not-allowed}
-.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;
+.mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;
   background:var(--line);border:1px solid var(--line)}
 .mdow{background:var(--ink);padding:9px 8px;text-align:center;
   font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.17em;
   text-transform:uppercase;color:var(--mute)}
-.mcell{background:var(--panel);min-height:112px;padding:8px 8px 10px;position:relative}
+.mcell{background:var(--panel);min-height:112px;padding:8px 8px 10px;position:relative;min-width:0;overflow:hidden}
 .mcell.out{background:var(--ink);opacity:.35}
 .mcell.past{opacity:.45}
 .mcell.istoday{box-shadow:inset 0 0 0 2px var(--gold)}
@@ -779,8 +754,17 @@ table.atable tr:last-child td{border-bottom:none}
 }
 
 /* ---------- schedule table ---------- */
-.sched-grid{display:grid;grid-template-columns:1fr 280px;gap:44px;align-items:start}
-@media(max-width:940px){.sched-grid{grid-template-columns:1fr;gap:34px}}
+.schedhead{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:32px;flex-wrap:wrap;margin-bottom:8px}
+.recbox{background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--gold);
+  padding:20px 30px;text-align:center;flex-shrink:0}
+.recbox .rn{display:block;font-family:var(--display);font-weight:800;font-size:56px;line-height:.9}
+.recbox .rl{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--mute);margin-top:8px}
+.teamshot{margin:0;background:var(--panel);border:1px solid var(--line);
+  border-top:2px solid var(--gold);padding:12px}
+.teamshot img{width:100%;display:block}
+.spontop{align-items:start}
 
 table.sched{width:100%;border-collapse:collapse}
 table.sched th{
@@ -879,7 +863,29 @@ table.sched tr:hover td{background:rgba(240,180,41,.03)}
 .card.give .btn{padding:11px 20px;font-size:14px}
 .card.give.featured{border-top-color:var(--gold)}
 
-.board{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.boardwrap{background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--line2)}
+table.btable{width:100%;border-collapse:collapse}
+table.btable td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.btable tr:last-child td{border-bottom:none}
+table.btable tr:hover td{background:var(--panel2)}
+.btable .bn{font-family:var(--display);font-weight:700;font-size:19px;
+  text-transform:uppercase;line-height:1.1;white-space:nowrap}
+.btable .bn.open{font-family:var(--cond);font-weight:600;font-size:14px;
+  letter-spacing:.13em;color:var(--gold-deep)}
+.btable .br{font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--mute);width:52%}
+.btable .by{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--gold-deep);text-align:right;white-space:nowrap}
+@media(max-width:640px){
+  table.btable td{padding:11px 14px;display:block;border-bottom:none}
+  table.btable tr{display:block;border-bottom:1px solid var(--line)}
+  .btable .br,.btable .by{width:auto;text-align:left;padding-top:0}
+}
+.joinaddr{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);
+  color:var(--mute);font-size:14px;line-height:1.7}
+.joinaddr strong{display:block;color:var(--bone);font-family:var(--cond);font-weight:700;
+  font-size:14px;letter-spacing:.09em;text-transform:uppercase;margin-bottom:3px}
+.joinaddr a{color:var(--gold);text-decoration:none;word-break:break-all}
 .board div{background:var(--panel);padding:20px 22px 22px;
   border:1px solid var(--line);border-top:2px solid var(--line2);
   transition:border-color .2s,background .2s}
@@ -932,7 +938,8 @@ table.roster .num{font-family:var(--display);font-weight:800;font-size:22px;colo
 @media(max-width:640px){.news-item{grid-template-columns:1fr;gap:6px}}
 
 /* footer */
-footer{border-top:1px solid var(--line);padding:56px 0 44px;background:var(--panel)}
+footer{border-top:1px solid var(--line);padding:34px 0 36px;background:var(--panel)}
+.fmin{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap}
 .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px}
 @media(max-width:900px){.fgrid{grid-template-columns:1fr 1fr;gap:30px}}
 @media(max-width:600px){.fgrid{grid-template-columns:1fr;gap:28px}}
@@ -941,9 +948,8 @@ footer h5{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:
 footer a{color:var(--mute);text-decoration:none;display:block;padding:4px 0;font-size:15px}
 footer a:hover{color:var(--gold)}
 footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
-.legal{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);
-  color:var(--line2);font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.09em;
-  text-transform:uppercase;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.legal{color:var(--line2);font-family:var(--cond);font-weight:500;font-size:13px;
+  letter-spacing:.09em;text-transform:uppercase}
 
 /* reveal */
 .rv{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
@@ -965,15 +971,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav">
       <a href="#schedule">Schedule</a>
-      <a href="#calendar">Calendar</a>
-      <a href="#archive">History</a>
-      <a href="#roster">Roster</a>
+      <a href="#team">Team</a>
+      <a href="#calendar">Events</a>
+      <a href="#donate" class="navgold">Donate</a>
+      <a href="#volunteer">Volunteer</a>
       <a href="#coaches">Coaches</a>
-      <a href="#gameday">Game day</a>
-      <a href="#play">Play</a>
       <a href="#boosters">Boosters</a>
+      <a href="#play">Play</a>
+      <a href="#archive">History</a>
       <a href="#sponsors">Sponsors</a>
-      <span class="recchip" id="recChip"></span>
+      <span class="social" id="social"></span>
     </nav>
   </div>
 </header>
@@ -982,44 +989,48 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
   <!-- HERO -->
   <section class="hero">
-    <div class="wrap">
-      <p class="week" id="heroWeek"></p>
-      <h1 class="matchup" id="heroMatchup"></h1>
-      <p class="gamefacts" id="heroFacts"></p>
-      <div class="clock" id="clock" aria-label="Time until kickoff"></div>
-      <div class="cta" id="heroCta"></div>
-    </div>
-  </section>
-
-  <!-- SEASON LADDER -->
-  <section id="schedule">
-    <div class="wrap">
-      <p class="eyebrow">The season</p>
-      <h2 class="sec">The slate</h2>
-      <p class="lede">Every game, opener to finale. Results fill in as they happen.</p>
-      <div class="ladder rv" id="ladder"></div>
+    <div class="wrap herogrid">
+      <div class="hcol">
+        <p class="week" id="heroWeek"></p>
+        <h1 class="matchup" id="heroMatchup"></h1>
+      </div>
+      <div class="hcol hcol-b">
+        <p class="gamefacts" id="heroFacts"></p>
+        <div class="clock" id="clock" aria-label="Time until kickoff"></div>
+        <div class="cta" id="heroCta"></div>
+      </div>
+      <div class="heroshot" id="heroShot"></div>
     </div>
   </section>
 
   <!-- SCHEDULE TABLE -->
   <section>
-    <div class="wrap sched-grid">
-      <div>
-        <p class="eyebrow">Full schedule</p>
-        <h2 class="sec">Dates &amp; results</h2>
-        <p class="lede">All kickoffs 7:00 PM. Home games at Pop Keeney Stadium in Bothell.</p>
-        <table class="sched">
-          <thead>
-            <tr><th>Date</th><th>Opponent</th><th>Result</th><th></th></tr>
-          </thead>
-          <tbody id="schedBody"></tbody>
-        </table>
+    <div class="wrap">
+      <div class="schedhead">
+        <div>
+          <p class="eyebrow">Full schedule</p>
+          <h2 class="sec">Dates &amp; results</h2>
+          <p class="lede">All kickoffs 7:00 PM. Home games at Pop Keeney Stadium in Bothell.</p>
+        </div>
+        <div class="recbox">
+          <span class="rn" id="recBig"></span>
+          <span class="rl">This season</span>
+        </div>
       </div>
-      <aside class="side rv">
-        <h3>This season</h3>
-        <p class="bigrec" id="recBig"></p>
-        <ul class="splits" id="splits"></ul>
-      </aside>
+      <table class="sched">
+        <thead><tr><th>Date</th><th>Opponent</th><th>Result</th><th></th></tr></thead>
+        <tbody id="schedBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TEAM PHOTO -->
+  <section id="team">
+    <div class="wrap">
+      <p class="eyebrow">The squad</p>
+      <h2 class="sec">2026 team photo</h2>
+      <p class="lede">Varsity and JV, all together.</p>
+      <div id="teamMount"></div>
     </div>
   </section>
 
@@ -1027,29 +1038,35 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   <section id="calendar">
     <div class="wrap">
       <p class="eyebrow">Team calendar</p>
-      <h2 class="sec">What&rsquo;s on</h2>
+      <h2 class="sec">Upcoming events</h2>
       <p class="lede" id="calLede"></p>
       <div class="calbar" id="calBar"></div>
       <div id="calMount"></div>
     </div>
   </section>
 
-  <!-- NEWS -->
-  <section id="news">
+  <!-- DONATE & FEES -->
+  <section id="donate">
     <div class="wrap">
-      <p class="eyebrow">Announcements</p>
-      <h2 class="sec">What's happening</h2>
-      <div id="newsList"></div>
+      <p class="eyebrow">Chip in</p>
+      <h2 class="sec">Donate &amp; fees</h2>
+      <p class="lede" id="donateLede"></p>
+      <div class="cards" id="supportGrid"></div>
     </div>
   </section>
 
-  <!-- ROSTER -->
-  <section id="roster">
+  <!-- VOLUNTEER -->
+  <section id="volunteer">
     <div class="wrap">
-      <p class="eyebrow">Varsity</p>
-      <h2 class="sec">Roster</h2>
-      <p class="lede">Numbers, positions and class year for the current varsity squad.</p>
-      <div id="rosterMount"></div>
+      <p class="eyebrow">Lend a hand</p>
+      <h2 class="sec">Volunteer</h2>
+      <div class="two">
+        <div>
+          <p class="quote" id="volLede"></p>
+          <p class="body-mute" id="volBody"></p>
+        </div>
+        <div id="volMount"></div>
+      </div>
     </div>
   </section>
 
@@ -1060,56 +1077,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <h2 class="sec">Coaches</h2>
       <p class="lede">The people running practice, calling plays and keeping players healthy.</p>
       <div class="rv" id="coachGrid"></div>
-    </div>
-  </section>
-
-  <!-- GAME DAY -->
-  <section id="gameday">
-    <div class="wrap">
-      <p class="eyebrow">Before you go</p>
-      <h2 class="sec">Game day</h2>
-      <div class="two">
-        <div class="cards" id="gamedayGrid" style="grid-template-columns:1fr"></div>
-        <div class="side rv">
-          <h3>Home field</h3>
-          <p class="bigrec" style="font-size:34px" id="fieldName"></p>
-          <p class="body-mute" style="margin:16px 0 0;font-size:15px" id="fieldMeta"></p>
-          <div class="cta" style="margin-top:24px">
-            <a class="btn" id="ticketBtn" href="#">Buy tickets</a>
-            <a class="btn ghost" id="mapBtn" href="#">Directions</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PLAY -->
-  <section id="play">
-    <div class="wrap">
-      <p class="eyebrow">Turning out</p>
-      <h2 class="sec">Play for the Vikes</h2>
-      <p class="lede" id="regOpens"></p>
-      <div class="two">
-        <div class="steps rv" id="regSteps"></div>
-        <div>
-          <h3 style="font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin:0 0 14px">Staying eligible</h3>
-          <ul class="checks" id="eligList"></ul>
-          <p class="note" id="regFoot"></p>
-          <div class="cta" style="margin-top:24px">
-            <a class="btn ghost" id="regBtn" href="#">Athletics registration</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAST SEASONS -->
-  <section id="archive">
-    <div class="wrap">
-      <p class="eyebrow">Program history</p>
-      <h2 class="sec">Past seasons</h2>
-      <p class="lede">Click a season to open the full results.</p>
-      <div id="archiveMount"></div>
     </div>
   </section>
 
@@ -1127,64 +1094,57 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       </div>
 
       <h3 class="subhead">The board</h3>
-      <div class="board" id="boardGrid"></div>
+      <div class="boardwrap"><table class="btable"><tbody id="boardGrid"></tbody></table></div>
+    </div>
+  </section>
 
-      <h3 class="subhead" id="support">Support the program</h3>
-      <div class="cards" id="supportGrid"></div>
-      <p class="note" id="zeffyNote"></p>
+  <!-- PLAY -->
+  <section id="play">
+    <div class="wrap">
+      <p class="eyebrow">Turning out</p>
+      <h2 class="sec">Play for the Viks</h2>
+      <p class="lede" id="regOpens"></p>
+      <div class="cta">
+        <a class="btn" id="regBtn" href="#" target="_blank" rel="noopener">Athletics registration</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAST SEASONS -->
+  <section id="archive">
+    <div class="wrap">
+      <p class="eyebrow">Program history</p>
+      <h2 class="sec">Past seasons</h2>
+      <p class="lede">Click a season to open the full results.</p>
+      <div id="archiveMount"></div>
     </div>
   </section>
 
   <!-- SPONSORS -->
   <section id="sponsors">
     <div class="wrap">
-      <p class="eyebrow">Community</p>
-      <h2 class="sec">Sponsors</h2>
-      <p class="lede">Local businesses that pay for helmets, film, meals and travel. Please give them your business.</p>
-      <div id="sponsorMount"></div>
+      <div class="two spontop">
+        <div>
+          <p class="eyebrow">Our partners</p>
+          <h2 class="sec">Sponsors</h2>
+          <p class="lede" style="margin-bottom:0">Local businesses that pay for helmets, film, meals and travel. Please give them your business.</p>
+        </div>
+        <div id="sponsorCta"></div>
+      </div>
+      <div id="sponsorMount" style="margin-top:34px"></div>
     </div>
   </section>
 
 </main>
 
 <footer>
-  <div class="wrap">
-    <div class="fgrid">
-      <div>
-        <a class="brand" href="#top" style="margin-bottom:16px">
-          <img class="mark" src="images/viking-v.png" alt="Inglemoor Vikings"
-               onerror="this.style.display='none'">
-          <b>Inglemoor Football</b>
-        </a>
-        <p class="addr" id="footAddr"></p>
-      </div>
-      <div>
-        <h5>The team</h5>
-        <a href="#schedule">Schedule</a>
-        <a href="#roster">Roster</a>
-        <a href="#coaches">Coaches</a>
-        <a href="#news">Announcements</a>
-      </div>
-      <div>
-        <h5>Support</h5>
-        <a id="fDues" href="#" target="_blank" rel="noopener">Pay booster dues</a>
-        <a id="fDonate" href="#" target="_blank" rel="noopener">Donate to the boosters</a>
-        <a id="fStore" href="#" target="_blank" rel="noopener">Buy spirit wear</a>
-        <a href="#sponsors">Become a sponsor</a>
-      </div>
-      <div>
-        <h5>Elsewhere</h5>
-        <a id="fMax" href="#" target="_blank" rel="noopener">Stats on MaxPreps</a>
-        <a id="fStream" href="#" target="_blank" rel="noopener">Watch on NFHS Network</a>
-        <a id="fIg" href="#" target="_blank" rel="noopener">Instagram</a>
-        <a id="fJr" href="#" target="_blank" rel="noopener">Vikings Junior Football</a>
-        <a id="fSchool" href="#" target="_blank" rel="noopener">IHS Athletics</a>
-      </div>
-    </div>
-    <div class="legal">
-      <span id="legalLeft"></span>
-      <span>Go Vikings</span>
-    </div>
+  <div class="wrap fmin">
+    <a class="brand" href="#top">
+      <img class="mark" src="images/viking-v.png" alt="Inglemoor Vikings"
+           onerror="this.style.display='none'">
+      <b>Inglemoor Football</b>
+    </a>
+    <span class="legal" id="legalLeft"></span>
   </div>
 </footer>
 
@@ -1236,10 +1196,17 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     return h + ":" + String(dt.getMinutes()).padStart(2,"0") + " " + ap;
   };
 
-  /* ---- record chip ---- */
-  $("#recChip").textContent = done.length
-    ? W + "–" + L + " · " + lgW + "–" + (lgDone.length - lgW) + " league"
-    : SITE.team.season + " season";
+  /* ---- social links in the header ---- */
+  (function(){
+    const ic = {
+      instagram:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2m0 2.2c-3.1 0-3.5 0-4.7.1-.9 0-1.4.2-1.7.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.3-.3.8-.3 1.7-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c0 .9.2 1.4.3 1.7.2.4.4.7.7 1 .3.3.6.5 1 .7.3.1.8.3 1.7.3 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c.9 0 1.4-.2 1.7-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.3.3-.8.3-1.7.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c0-.9-.2-1.4-.3-1.7-.2-.4-.4-.7-.7-1-.3-.3-.6-.5-1-.7-.3-.1-.8-.3-1.7-.3-1.2-.1-1.6-.1-4.7-.1m0 3.7a3.9 3.9 0 1 1 0 7.8 3.9 3.9 0 0 1 0-7.8m0 6.4a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5m5-6.6a.9.9 0 1 1-1.8 0 .9.9 0 0 1 1.8 0"/></svg>',
+      facebook:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.45 2.9h-2.33v7A10 10 0 0 0 22 12.06"/></svg>'
+    };
+    const out = [];
+    if (SITE.links.instagram) out.push('<a href="'+SITE.links.instagram+'" target="_blank" rel="noopener" aria-label="Instagram">'+ic.instagram+'</a>');
+    if (SITE.links.facebook)  out.push('<a href="'+SITE.links.facebook+'" target="_blank" rel="noopener" aria-label="Facebook">'+ic.facebook+'</a>');
+    $("#social").innerHTML = out.join("");
+  })();
 
   /* ---- HERO ---- */
   if (next) {
@@ -1262,8 +1229,15 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     const cta = [];
     if (SITE.links.tickets) cta.push('<a class="btn" href="'+SITE.links.tickets+'" target="_blank" rel="noopener">Buy tickets</a>');
     if (SITE.links.stream)  cta.push('<a class="btn ghost" href="'+SITE.links.stream+'" target="_blank" rel="noopener">Watch live</a>');
-    if (next.home && SITE.homeField.map) cta.push('<a class="btn ghost" href="'+SITE.homeField.map+'" target="_blank" rel="noopener">Directions</a>');
     $("#heroCta").innerHTML = cta.join("");
+
+    // optional action shot
+    if (SITE.heroImage){
+      $("#heroShot").innerHTML = '<img src="'+SITE.heroImage+'" alt="Inglemoor Viking football" ' +
+        'onerror="this.parentNode.remove()">';
+    } else {
+      $("#heroShot").remove();
+    }
 
     // countdown
     const units = [["Days",864e5],["Hrs",36e5],["Min",6e4],["Sec",1e3]];
@@ -1287,26 +1261,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     $("#clock").remove();
     $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the season</a>';
   }
-
-  /* ---- SEASON LADDER ---- */
-  $("#ladder").innerHTML = games.map(g => {
-    if (g.tbd) {
-      return '<div class="rung tbd">' +
-        '<div class="d">When we qualify</div>' +
-        '<div class="o">' + g.abbr + '</div>' +
-        '<span class="r pending">TBD</span>' +
-      '</div>';
-    }
-    let cls = "rung", res;
-    if (g.played) { cls += g.won ? " w" : " l"; res = (g.won ? "W " : "L ") + g.us + "–" + g.them; }
-    else if (next && g.i === next.i) { cls += " next"; res = '<span class="r pending">Next up</span>'; }
-    else { res = '<span class="r pending">' + fmtTime(g.when) + '</span>'; }
-    return '<div class="'+cls+'">' +
-      '<div class="d">' + (g.home ? "vs" : "at") + " " + MON[g.when.getMonth()] + " " + g.when.getDate() + '</div>' +
-      '<div class="o">' + g.abbr + '</div>' +
-      (g.played ? '<div class="r">'+res+'</div>' : res) +
-    '</div>';
-  }).join("");
 
   /* ---- PREVIEW BANNER ---- */
   const pv = SITE.preview;
@@ -1349,20 +1303,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   }).join("");
 
   /* ---- SIDEBAR RECORD ---- */
-  $("#recBig").innerHTML = done.length
-    ? W + '–' + L + '<small>Overall · ' + SITE.team.season + '</small>'
-    : '0–0<small>Season opens ' + (games[0] ? MON[games[0].when.getMonth()] + " " + games[0].when.getDate() : "soon") + '</small>';
-
-  const real = games.filter(g => !g.tbd);
-  $("#splits").innerHTML = done.length ? [
-    ["League", lgW + "–" + (lgDone.length - lgW)],
-    ["Home",   homeDone.filter(g=>g.won).length + "–" + (homeDone.length - homeDone.filter(g=>g.won).length)],
-    ["Points for", PF],
-    ["Points against", PA]
-  ].map(r => '<li><span>'+r[0]+'</span><span>'+r[1]+'</span></li>').join("")
-    : '<li><span>Regular season games</span><span>'+real.length+'</span></li>' +
-      '<li><span>League games</span><span>'+real.filter(g=>g.league).length+'</span></li>' +
-      '<li><span>Home games</span><span>'+real.filter(g=>g.home).length+'</span></li>';
+  $("#recBig").textContent = done.length ? W + "–" + L : "0–0";
 
   /* ---- TEAM CALENDAR ---- */
   (async function(){
@@ -1545,46 +1486,18 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     draw();
   })();
 
-  /* ---- NEWS ---- */
-  const newsSorted = (SITE.news||[]).slice().sort((a,b) => (b.date||"").localeCompare(a.date||""));
-  $("#newsList").innerHTML = newsSorted.length
-    ? newsSorted.map(n => {
-        const [y,m,d] = n.date.split("-").map(Number);
-        return '<article class="news-item rv"><time>'+MON[m-1]+' '+d+', '+y+'</time>' +
-          '<div><h4>'+n.title+'</h4><p>'+n.body+'</p></div></article>';
-      }).join("")
-    : '<div class="empty"><h4>No announcements yet</h4><p>Open <code>post-news.html</code> to add one.</p></div>';
-
-  /* ---- ROSTER ---- */
-  const rm = $("#rosterMount");
-  if (!SITE.roster.length) {
-    rm.innerHTML = '<div class="empty"><h4>Roster coming soon</h4>' +
-      '<p>Either a roster or a team photo will go here.</p></div>';
-  } else {
-    const groups = { OFF:["QB","RB","FB","WR","TE","OL","C","G","T"], DEF:["DL","DE","DT","LB","CB","S","DB"], ST:["K","P","LS","KR","PR"] };
-    const positions = ["All"].concat(Object.keys(groups));
-    rm.innerHTML =
-      '<div class="filters" id="rFilters">' + positions.map((p,k) =>
-        '<button data-g="'+p+'" aria-pressed="'+(k===0)+'">'+({All:"All",OFF:"Offense",DEF:"Defense",ST:"Special teams"}[p])+'</button>').join("") + '</div>' +
-      '<table class="roster"><thead><tr><th>#</th><th>Name</th><th>Pos</th><th>Yr</th><th>Ht</th><th>Wt</th></tr></thead><tbody id="rBody"></tbody></table>';
-
-    const YR = {9:"Fr",10:"So",11:"Jr",12:"Sr"};
-    const draw = g => {
-      const list = SITE.roster
-        .filter(p => g === "All" || (groups[g]||[]).indexOf(p.pos) > -1)
-        .sort((a,b) => a.no - b.no);
-      $("#rBody").innerHTML = list.length ? list.map(p =>
-        '<tr><td class="num">'+p.no+'</td><td><b>'+p.name+'</b></td><td>'+p.pos+'</td>' +
-        '<td>'+(YR[p.yr]||p.yr||"")+'</td><td>'+(p.ht||"—")+'</td><td>'+(p.wt||"—")+'</td></tr>').join("")
-        : '<tr><td colspan="6" style="color:var(--mute);padding:22px 0">No players listed in this group.</td></tr>';
-    };
-    draw("All");
-    $("#rFilters").addEventListener("click", e => {
-      const b = e.target.closest("button"); if (!b) return;
-      $("#rFilters").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
-      draw(b.dataset.g);
-    });
-  }
+  /* ---- TEAM PHOTO ---- */
+  (function(){
+    const m = $("#teamMount");
+    if (SITE.teamPhoto){
+      m.innerHTML = '<figure class="teamshot"><img src="'+SITE.teamPhoto+'" ' +
+        'alt="Inglemoor Vikings 2026 varsity and JV" loading="lazy"></figure>';
+    } else {
+      m.innerHTML = '<div class="empty"><h4>Team photo coming soon</h4>' +
+        '<p>Varsity and JV together. Add the file to <code>images/</code> and set ' +
+        '<code>teamPhoto</code> at the top of this file.</p></div>';
+    }
+  })();
 
   /* ---- COACHES ---- */
   (function(){
@@ -1653,33 +1566,20 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     });
   })();
 
-  /* ---- GAME DAY ---- */
-  $("#gamedayGrid").innerHTML = SITE.gameday.map(g =>
-    '<div class="card"><h4>'+g.t+'</h4><p>'+g.d+'</p></div>').join("");
-  $("#fieldName").textContent = SITE.homeField.name;
-  $("#fieldMeta").innerHTML = SITE.homeField.address + '<br><br>' + SITE.homeField.note;
-  $("#ticketBtn").href = SITE.links.tickets || "#";
-  $("#mapBtn").href = SITE.homeField.map || "#";
-  $("#ticketBtn").target = $("#mapBtn").target = "_blank";
-
-  /* ---- REGISTRATION ---- */
+  /* ---- PLAY ---- */
   $("#regOpens").textContent = SITE.registration.opens;
-  $("#regSteps").innerHTML = SITE.registration.steps.map(s =>
-    '<div class="step"><div><h4>'+s.t+'</h4><p>'+s.d+'</p></div></div>').join("");
-  $("#eligList").innerHTML = SITE.registration.eligibility.map(e => '<li>'+e+'</li>').join("");
-  $("#regFoot").textContent = SITE.registration.footnote;
   $("#regBtn").href = SITE.links.register || "#";
-  $("#regBtn").target = "_blank";
 
   /* ---- BOOSTERS ---- */
   $("#bMission").textContent = SITE.boosters.mission;
   $("#bDetail").textContent  = SITE.boosters.detail;
   $("#boardGrid").innerHTML = SITE.boosters.board.map(b =>
-    '<div>' +
-      '<div class="n'+(b.name?"":" open")+'">'+(b.name || "Open — join us")+'</div>' +
-      '<div class="r">'+b.role+'</div>' +
-      (b.year ? '<div class="y">Class of '+b.year+'</div>' : '') +
-    '</div>').join("");
+    '<tr>' +
+      '<td class="bn'+(b.name?"":" open")+'">'+(b.name || "Open — join us")+'</td>' +
+      '<td class="br">'+b.role+'</td>' +
+      '<td class="by">'+(b.year ? "Class of "+b.year : "")+'</td>' +
+    '</tr>').join("");
+
 
   const j = SITE.boosters.join;
   $("#joinMount").innerHTML = (j && j.show)
@@ -1687,9 +1587,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         '<h3>'+j.heading+'</h3>' +
         '<p>'+j.body+'</p>' +
         (SITE.contact.email
-          ? '<a class="btn" href="mailto:'+SITE.contact.email+'?subject=Interested%20in%20joining%20the%20board">'+(j.cta||"Get in touch")+'</a>' +
-            '<p class="jmail">'+SITE.contact.email+'</p>'
+          ? '<a class="btn" href="mailto:'+SITE.contact.email+'?subject=Interested%20in%20joining%20the%20board">' +
+            (j.cta||"Get in touch") + '</a>'
           : '') +
+        '<div class="joinaddr">' +
+          '<strong>' + SITE.boosters.legalName + '</strong>' +
+          SITE.boosters.address + '<br>' + SITE.boosters.status +
+          (SITE.contact.email
+            ? '<br><a href="mailto:'+SITE.contact.email+'">'+SITE.contact.email+'</a>'
+            : '') +
+        '</div>' +
       '</div>'
     : '';
 
@@ -1698,8 +1605,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     const links = s.links && s.links.length
       ? s.links
       : (s.url ? [{ label: s.cta || "Open", url: s.url }] : []);
-    const buttons = links.map((l,ix) =>
-      '<a class="btn' + (s.featured && ix === 0 ? "" : " ghost") + '" href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>'
+    const buttons = links.map(l =>
+      '<a class="btn" href="'+l.url+'" target="_blank" rel="noopener">'+l.label+'</a>'
     ).join("");
     return '<div class="card give' + (s.featured ? " featured" : "") + '">' +
       '<h4>'+s.t+'</h4>' +
@@ -1708,8 +1615,32 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     '</div>';
   }).join("");
 
-  $("#zeffyNote").textContent =
-    "Payments are handled by Zeffy. " + SITE.boosters.legalName + " is a " + SITE.boosters.status.toLowerCase() + ".";
+  $("#donateLede").textContent =
+    "Booster dues, donations and spirit wear all run through Zeffy. Every dollar goes back into the program. " +
+    SITE.boosters.legalName + " is a " + SITE.boosters.status.toLowerCase() + ".";
+
+  /* ---- VOLUNTEER ---- */
+  (function(){
+    const v = SITE.volunteer;
+    if (!v || !v.show){ const n = $("#volunteer"); if (n) n.remove(); return; }
+    $("#volLede").textContent = v.lede;
+    $("#volBody").textContent = v.body;
+    $("#volMount").innerHTML = '<div class="join">' +
+      '<h3>Sign up for a shift</h3>' +
+      '<p>Shifts are posted on SignUpGenius. Pick what fits — no account needed.</p>' +
+      '<a class="btn" href="'+v.url+'" target="_blank" rel="noopener">'+(v.cta||"See open shifts")+'</a>' +
+    '</div>';
+  })();
+
+  /* ---- BECOME A SPONSOR ---- */
+  $("#sponsorCta").innerHTML = SITE.contact.email
+    ? '<div class="join">' +
+        '<h3>Become a sponsor</h3>' +
+        '<p>Three tiers, and your logo runs here all season. Get in touch and we will send the details.</p>' +
+        '<a class="btn" href="mailto:'+SITE.contact.email+'?subject=Sponsoring%20Inglemoor%20football">Email the boosters</a>' +
+        '<p class="jmail">'+SITE.contact.email+'</p>' +
+      '</div>'
+    : '';
 
   /* ---- SPONSORS ---- */
   (function(){
@@ -1740,29 +1671,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   })();
 
   /* ---- FOOTER ---- */
-  $("#footAddr").innerHTML = SITE.boosters.legalName + '<br>' +
-    SITE.boosters.address + '<br>' + SITE.boosters.status +
-    (SITE.contact.email ? '<br><a href="mailto:'+SITE.contact.email+'" style="display:inline;color:var(--gold)">'+SITE.contact.email+'</a>' : '');
-  $("#fMax").href    = SITE.links.maxpreps;
-  const dues = (SITE.support||[]).find(s => /dues/i.test(s.t));
-  $("#fDues").href   = (dues && dues.url) || SITE.links.donate;
-  $("#fDonate").href = SITE.links.donate;
-  $("#fStore").href  = SITE.links.store;
-  $("#fStream").href = SITE.links.stream;
-  $("#fIg").href     = SITE.links.instagram;
-  $("#fJr").href     = SITE.links.juniors;
-  $("#fSchool").href = SITE.contact.schoolAthletics;
   $("#legalLeft").textContent = "© " + new Date().getFullYear() + " " + SITE.boosters.legalName +
     (pv && pv.show ? " · Preview site — not yet live" : "");
 
   /* ---- PAST SEASONS ---- */
-  const am = $("#archiveMount");
-  am.innerHTML = (SITE.archive||[]).map((s,k) => {
-    const w  = s.games.filter(g => g.us > g.them).length;
-    const l  = s.games.length - w;
-    const pf = s.games.reduce((t,g) => t + g.us, 0);
-    const pa = s.games.reduce((t,g) => t + g.them, 0);
-    const rows = s.games.map(g => {
+  $("#archiveMount").innerHTML = (SITE.archive||[]).map(sn => {
+    const w  = sn.games.filter(g => g.us > g.them).length;
+    const l  = sn.games.length - w;
+    const pf = sn.games.reduce((t,g) => t + g.us, 0);
+    const pa = sn.games.reduce((t,g) => t + g.them, 0);
+    const rows = sn.games.map(g => {
       const won = g.us > g.them;
       return '<tr>' +
         '<td class="ad">' + g.date + '</td>' +
@@ -1772,18 +1690,17 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         '<td><span class="res ' + (won ? "w" : "l") + '">' + (won ? "W" : "L") + " " + g.us + "–" + g.them + '</span></td>' +
       '</tr>';
     }).join("");
-
     return '<details class="season">' +
       '<summary>' +
-        '<span class="yr">' + s.year + '</span>' +
+        '<span class="yr">' + sn.year + '</span>' +
         '<span class="rec">' + w + '–' + l + '</span>' +
-        '<span class="meta">' + (s.coach ? s.coach + ' · ' : '') + (s.note || '') + '</span>' +
+        '<span class="meta">' + (sn.coach ? sn.coach + ' · ' : '') + (sn.note || '') + '</span>' +
         '<span class="chev" aria-hidden="true"></span>' +
       '</summary>' +
       '<div class="seasonbody">' +
         '<table class="atable"><tbody>' + rows + '</tbody></table>' +
-        '<p class="atotals">' + s.games.length + ' games · ' + pf + ' points for · ' + pa + ' points against' +
-          (s.link ? ' · <a class="mini" href="'+s.link+'" target="_blank" rel="noopener">Box scores on MaxPreps &rarr;</a>' : '') +
+        '<p class="atotals">' + sn.games.length + ' games · ' + pf + ' points for · ' + pa + ' points against' +
+          (sn.link ? ' · <a class="mini" href="'+sn.link+'" target="_blank" rel="noopener">Box scores on MaxPreps &rarr;</a>' : '') +
         '</p>' +
       '</div>' +
     '</details>';
