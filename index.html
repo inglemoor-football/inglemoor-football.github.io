@@ -256,18 +256,18 @@ const SITE = {
      sponsors come in.
      --------------------------------------------------------- */
   sponsors: [
-    { name:"Gold 1",   tier:"gold",   logo:"", url:"" },
-    { name:"Gold 2",   tier:"gold",   logo:"", url:"" },
-    { name:"Gold 3",   tier:"gold",   logo:"", url:"" },
-    { name:"Gold 4",   tier:"gold",   logo:"", url:"" },
-    { name:"Silver 1", tier:"silver", logo:"", url:"" },
-    { name:"Silver 2", tier:"silver", logo:"", url:"" },
-    { name:"Silver 3", tier:"silver", logo:"", url:"" },
-    { name:"Silver 4", tier:"silver", logo:"", url:"" },
-    { name:"Bronze 1", tier:"bronze", logo:"", url:"" },
-    { name:"Bronze 2", tier:"bronze", logo:"", url:"" },
-    { name:"Bronze 3", tier:"bronze", logo:"", url:"" },
-    { name:"Bronze 4", tier:"bronze", logo:"", url:"" }
+    { name:"UBS",                            tier:"gold",   logo:"images/sponsors/ubs.png",          url:"" },
+    { name:"Gold 2",                         tier:"gold",   logo:"", url:"" },
+    { name:"Gold 3",                         tier:"gold",   logo:"", url:"" },
+    { name:"Gold 4",                         tier:"gold",   logo:"", url:"" },
+    { name:"Law Offices of Tara L. Eubanks", tier:"silver", logo:"images/sponsors/eubanks-law.png",  url:"" },
+    { name:"Silver 2",                       tier:"silver", logo:"", url:"" },
+    { name:"Silver 3",                       tier:"silver", logo:"", url:"" },
+    { name:"Silver 4",                       tier:"silver", logo:"", url:"" },
+    { name:"The Pizza Coop & Ale House",     tier:"bronze", logo:"images/sponsors/pizza-coop.png",   url:"" },
+    { name:"Bronze 2",                       tier:"bronze", logo:"", url:"" },
+    { name:"Bronze 3",                       tier:"bronze", logo:"", url:"" },
+    { name:"Bronze 4",                       tier:"bronze", logo:"", url:"" }
   ],
 
   // Tier labels and blurbs shown above each row.
@@ -626,17 +626,21 @@ nav a:hover{color:var(--bone)}
 .tierrow::-webkit-scrollbar-thumb{background:var(--line2)}
 .tierrow::-webkit-scrollbar-track{background:transparent}
 
-.sponsor{flex:0 0 210px;scroll-snap-align:start;background:var(--panel);
-  border:1px solid var(--line);border-top:2px solid var(--line2);min-height:112px;padding:20px;
+.sponsor{flex:0 0 210px;scroll-snap-align:start;background:var(--bone);
+  border:1px solid var(--line);border-top:2px solid var(--line2);min-height:124px;padding:20px 22px;
   display:grid;place-items:center;text-decoration:none;transition:.2s}
-.sponsor:hover{background:var(--panel2);border-top-color:var(--gold)}
-.sponsor img{max-width:100%;max-height:74px;object-fit:contain}
+.sponsor:hover{border-top-color:var(--gold);transform:translateY(-2px)}
+.sponsor img{max-width:100%;max-height:84px;object-fit:contain}
+/* empty slots stay dark and outlined, so a gap reads as a gap */
+.sponsor.empty{background:transparent;border:1px dashed var(--line2);
+  border-top-width:1px;min-height:124px}
+.sponsor.empty:hover{background:var(--panel);border-color:var(--gold-deep);transform:none}
 .sponsor .ph{font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--line2);text-align:center}
-.sponsor.empty{background:transparent;border:1px dashed var(--line2);border-top-width:1px}
-.sponsor.empty:hover{background:var(--panel);border-color:var(--gold-deep)}
-.tier-gold   .sponsor{flex-basis:250px;min-height:132px}
-.tier-bronze .sponsor{flex-basis:180px;min-height:96px}
+.tier-gold   .sponsor{flex-basis:260px;min-height:148px}
+.tier-gold   .sponsor img{max-height:104px}
+.tier-bronze .sponsor{flex-basis:190px;min-height:110px}
+.tier-bronze .sponsor img{max-height:70px}
 @media(max-width:560px){
   .sponsor,.tier-gold .sponsor,.tier-bronze .sponsor{flex-basis:150px;min-height:92px}
 }
