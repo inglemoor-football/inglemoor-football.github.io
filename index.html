@@ -177,7 +177,7 @@ const SITE = {
   // The 2026 team photo, varsity and JV together. Drop the file into
   // images/ and set the path here, e.g. "images/team-2026.jpg".
   // Left empty, the section shows a tidy placeholder instead.
-  teamPhoto: "",
+  teamPhoto: "images/team-2026.jpg",
 
   /* ---- COACHES --------------------------------------------
      Mirrors IHS_Coaches_List.xlsx. "team" groups them on the
@@ -318,7 +318,10 @@ const SITE = {
   },
 
   registration: {
-    opens: "Registration opens May 1 each year and runs through FinalForms. Your information carries over season to season, so it is quick after the first time. You will also need an ASB sticker and the $200 athletic fee, both handled through the school."
+    opens: "Registration opens May 1 and runs through FinalForms. You will also need an ASB sticker and the $200 athletic fee, both handled by the school. Your details carry over year to year, so it is quick after the first time.",
+    ctaHeading: "New to the program?",
+    ctaBody: "Start with FinalForms — create a parent account, add your student, and pick football. Everything else follows from there.",
+    ctaLabel: "Athletics registration"
   },
 
   contact: {
@@ -764,6 +767,9 @@ table.atable tr:last-child td{border-bottom:none}
 .teamshot{margin:0;background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--gold);padding:12px}
 .teamshot img{width:100%;display:block}
+.teamshot figcaption{font-family:var(--cond);font-weight:600;font-size:13px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mute);
+  padding:14px 4px 4px;text-align:center}
 .spontop{align-items:start}
 
 table.sched{width:100%;border-collapse:collapse}
@@ -1101,11 +1107,13 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   <!-- PLAY -->
   <section id="play">
     <div class="wrap">
-      <p class="eyebrow">Turning out</p>
-      <h2 class="sec">Play for the Viks</h2>
-      <p class="lede" id="regOpens"></p>
-      <div class="cta">
-        <a class="btn" id="regBtn" href="#" target="_blank" rel="noopener">Athletics registration</a>
+      <div class="two spontop">
+        <div>
+          <p class="eyebrow">Turning out</p>
+          <h2 class="sec">Play for the Vikings</h2>
+          <p class="lede" id="regOpens" style="margin-bottom:0"></p>
+        </div>
+        <div id="playCta"></div>
       </div>
     </div>
   </section>
@@ -1490,8 +1498,10 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   (function(){
     const m = $("#teamMount");
     if (SITE.teamPhoto){
-      m.innerHTML = '<figure class="teamshot"><img src="'+SITE.teamPhoto+'" ' +
-        'alt="Inglemoor Vikings 2026 varsity and JV" loading="lazy"></figure>';
+      m.innerHTML = '<figure class="teamshot">' +
+        '<img src="'+SITE.teamPhoto+'" alt="Inglemoor Vikings 2026 varsity and JV team photo" loading="lazy">' +
+        '<figcaption>Inglemoor Vikings &middot; Varsity and JV &middot; 2026</figcaption>' +
+      '</figure>';
     } else {
       m.innerHTML = '<div class="empty"><h4>Team photo coming soon</h4>' +
         '<p>Varsity and JV together. Add the file to <code>images/</code> and set ' +
@@ -1567,8 +1577,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   })();
 
   /* ---- PLAY ---- */
-  $("#regOpens").textContent = SITE.registration.opens;
-  $("#regBtn").href = SITE.links.register || "#";
+  (function(){
+    const r = SITE.registration;
+    $("#regOpens").textContent = r.opens;
+    $("#playCta").innerHTML = '<div class="join">' +
+      '<h3>' + (r.ctaHeading || "Ready to sign up?") + '</h3>' +
+      '<p>' + (r.ctaBody || "") + '</p>' +
+      '<a class="btn" href="' + (SITE.links.register || "#") + '" target="_blank" rel="noopener">' +
+        (r.ctaLabel || "Athletics registration") + '</a>' +
+    '</div>';
+  })();
 
   /* ---- BOOSTERS ---- */
   $("#bMission").textContent = SITE.boosters.mission;
