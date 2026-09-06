@@ -102,6 +102,10 @@ const SITE = {
     store:    "https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop"
   },
 
+  // Minutes after kickoff that a game still shows as "In progress".
+  // After that it reads "Final · score pending" until a score is entered.
+  gameLengthMinutes: 165,
+
   /* ---- SCHEDULE -------------------------------------------
      date  : "YYYY-MM-DD" and time in 24h "HH:MM"
      at    : "home" or "away"
@@ -109,7 +113,7 @@ const SITE = {
      Add us/them once the game is played:  us: 28, them: 14
      --------------------------------------------------------- */
   schedule: [
-    { date:"2026-09-05", time:"19:00", opp:"Juanita",          abbr:"JUA", at:"home", league:false },
+    { date:"2026-09-05", time:"19:00", opp:"Juanita",          abbr:"JUA", at:"home", league:false, us:23, them:21 },
     { date:"2026-09-11", time:"19:00", opp:"Highline",         abbr:"HIG", at:"away", league:true  },
     { date:"2026-09-18", time:"19:00", opp:"Mercer Island",    abbr:"MER", at:"home", league:true  },
     { date:"2026-09-25", time:"19:00", opp:"Interlake",        abbr:"INT", at:"away", league:true  },
@@ -795,6 +799,17 @@ table.sched tr:hover td{background:rgba(240,180,41,.03)}
 .tag{font-family:var(--cond);font-weight:600;font-size:11px;letter-spacing:.15em;
   text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-deep);
   padding:2px 7px;border-radius:2px;white-space:nowrap}
+.tag.live{color:var(--ink);background:var(--gold);border-color:var(--gold);
+  display:inline-flex;align-items:center;gap:7px}
+.tag.live i{width:7px;height:7px;border-radius:50%;background:var(--ink);
+  animation:pulse 1.6s ease-in-out infinite}
+.livebox{display:inline-flex;align-items:center;gap:11px;
+  font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink);background:var(--gold);padding:14px 26px}
+.livebox i{width:11px;height:11px;border-radius:50%;background:var(--ink);
+  animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.tag.live i,.livebox i{animation:none}}
 .mini{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.11em;
   text-transform:uppercase;color:var(--mute);text-decoration:none;white-space:nowrap}
 .mini:hover{color:var(--gold)}
@@ -1176,8 +1191,12 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     const [hh,mm] = (g.time||"19:00").split(":").map(Number);
     const when = new Date(y, m-1, d, hh, mm);
     const played = typeof g.us === "number" && typeof g.them === "number";
+    const ends = new Date(when.getTime() + (SITE.gameLengthMinutes || 165)*60000);
+    const t = new Date();
     return Object.assign({}, g, {
-      i, when, played,
+      i, when, ends, played,
+      live: !played && t >= when && t < ends,
+      awaiting: !played && t >= ends,
       won: played ? g.us > g.them : null,
       home: g.at === "home",
       tbd: false
@@ -1189,7 +1208,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   }).map((g,n) => Object.assign(g, { i:n }));
 
   const now = new Date();
-  const upcoming = games.filter(g => !g.tbd && !g.played && g.when >= now);
+  const upcoming = games.filter(g => !g.tbd && !g.played && !g.live && !g.awaiting && g.when >= now);
+  const liveGame = games.find(g => g.live) || null;
   const next = upcoming[0] || null;
 
   const done = games.filter(g => g.played);
@@ -1221,10 +1241,13 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   })();
 
   /* ---- HERO ---- */
-  if (next) {
+  const feature = liveGame || next;
+  if (feature) {
+    const next = feature;                 // hero speaks about this game
     const wk = next.i + 1;
     $("#heroWeek").innerHTML =
-      '<span class="dot"></span>Next up · Game ' + wk + ' of ' + games.length +
+      '<span class="dot"></span>' + (feature.live ? "Playing now" : "Next up") +
+      ' · Game ' + wk + ' of ' + games.length +
       '<span class="dot"></span>' + SITE.team.league + ' ' + SITE.team.class +
       (next.league ? '<span class="dot"></span>League game' : '');
 
@@ -1251,20 +1274,29 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       $("#heroShot").remove();
     }
 
-    // countdown
-    const units = [["Days",864e5],["Hrs",36e5],["Min",6e4],["Sec",1e3]];
+    // countdown, or a live badge once it has kicked off
     const box = $("#clock");
-    box.innerHTML = units.map(u => '<div class="tick"><b>--</b><i>'+u[0]+'</i></div>').join("");
-    const bs = box.querySelectorAll("b");
-    const tickTock = () => {
-      let ms = next.when - new Date();
-      if (ms <= 0) { box.innerHTML = '<div class="tick" style="width:auto;padding:12px 26px"><b>Kickoff</b><i>Game in progress</i></div>'; return; }
-      units.forEach((u,k) => {
-        const v = Math.floor(ms / u[1]); ms -= v * u[1];
-        bs[k].textContent = String(v).padStart(2,"0");
-      });
-    };
-    tickTock(); setInterval(tickTock, 1000);
+    if (feature.live){
+      box.innerHTML = '<div class="livebox"><i></i>In progress</div>';
+      setTimeout(() => location.reload(), 10*60*1000);   // recheck every 10 minutes
+    } else {
+      const units = [["Days",864e5],["Hrs",36e5],["Min",6e4],["Sec",1e3]];
+      box.innerHTML = units.map(u => '<div class="tick"><b>--</b><i>'+u[0]+'</i></div>').join("");
+      const bs = box.querySelectorAll("b");
+      const tickTock = () => {
+        let ms = next.when - new Date();
+        if (ms <= 0){
+          box.innerHTML = '<div class="livebox"><i></i>In progress</div>';
+          setTimeout(() => location.reload(), 10*60*1000);
+          return;
+        }
+        units.forEach((u,k) => {
+          const v = Math.floor(ms / u[1]); ms -= v * u[1];
+          bs[k].textContent = String(v).padStart(2,"0");
+        });
+      };
+      tickTock(); setInterval(tickTock, 1000);
+    }
   } else {
     $("#heroWeek").innerHTML = '<span class="dot"></span>' + SITE.team.season + ' season complete';
     $("#heroMatchup").innerHTML =
@@ -1298,6 +1330,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     }
     let res;
     if (g.played) res = '<span class="res '+(g.won?"w":"l")+'">'+(g.won?"W":"L")+" "+g.us+"–"+g.them+'</span>';
+    else if (g.live) res = '<span class="tag live"><i></i>In progress</span>';
+    else if (g.awaiting) res = '<span class="res p">Final &middot; score pending</span>';
     else if (next && g.i === next.i) res = '<span class="tag">Next up</span>';
     else res = '<span class="res p">'+fmtTime(g.when)+'</span>';
 

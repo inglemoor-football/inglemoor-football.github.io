@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Scores — Inglemoor Football</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+<meta name="theme-color" content="#FEB72E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+
+<script>
+/* ============================================================
+   The Cloudflare Worker address. Paste yours here after you
+   deploy it — it will look like:
+   https://inglemoor-scores.SOMETHING.workers.dev
+   ============================================================ */
+const WORKER_URL = "https://inglemoor-scores.grahamcomley.workers.dev";
+</script>
+
+<style>
+:root{
+  --ink:#0A0B0D;--panel:#14161A;--panel2:#1B1E24;--line:#2A2E36;--line2:#3A404A;
+  --gold:#FEB72E;--gold-deep:#BF8A23;--bone:#F4F1E9;--mute:#8A929E;
+  --win:#5CB87F;--loss:#C4574B;
+  --display:'Big Shoulders Display',sans-serif;--body:'Barlow',system-ui,sans-serif;
+  --cond:'Barlow Condensed',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--body);
+  line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:660px;margin:0 auto;padding:32px 20px 90px}
+
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;margin-bottom:26px}
+.brand img{height:34px;width:auto;display:block}
+.brand b{font-family:var(--display);font-weight:800;font-size:19px;
+  letter-spacing:.03em;text-transform:uppercase;line-height:1}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,8vw,46px);
+  text-transform:uppercase;line-height:.95;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 26px;font-size:16px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--line2);
+  padding:22px;margin-bottom:14px}
+.card.gold{border-top-color:var(--gold)}
+label{display:block;font-family:var(--cond);font-weight:700;font-size:12px;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+input{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--bone);
+  font-family:var(--body);font-size:17px;padding:13px 15px}
+input:focus{border-color:var(--gold);outline:none}
+.check{display:flex;align-items:center;gap:10px;margin-top:14px;color:var(--mute);font-size:14.5px}
+.check input{width:20px;height:20px;accent-color:var(--gold)}
+
+.btn{font-family:var(--cond);font-weight:700;font-size:15px;letter-spacing:.13em;
+  text-transform:uppercase;padding:14px 26px;border:1px solid var(--gold);
+  background:var(--gold);color:var(--ink);cursor:pointer;width:100%;margin-top:16px}
+.btn:hover:not(:disabled){background:#FFC754;border-color:#FFC754}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--mute);border-color:var(--line2);width:auto;
+  padding:9px 18px;font-size:13px;margin:0}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold);background:transparent}
+
+.games{display:grid;gap:2px}
+.game{background:var(--ink);border:1px solid var(--line);border-left:3px solid var(--line2);
+  padding:15px 17px;display:grid;grid-template-columns:1fr auto;gap:12px;
+  align-items:center;cursor:pointer;text-align:left;width:100%;color:inherit;
+  font-family:inherit;font-size:inherit}
+.game:hover{background:var(--panel2);border-left-color:var(--gold)}
+.game.done{border-left-color:var(--win)}
+.game .g1{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.03em}
+.game .g2{font-family:var(--cond);font-weight:600;font-size:12.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mute);margin-top:2px}
+.game .sc{font-family:var(--display);font-weight:800;font-size:22px;white-space:nowrap}
+.game .sc.w{color:var(--win)} .game .sc.l{color:var(--loss)}
+.game .sc.none{font-family:var(--cond);font-weight:600;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--line2)}
+
+.scorerow{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;margin-top:6px}
+.scorerow .dash{font-family:var(--display);font-weight:800;font-size:30px;
+  color:var(--line2);padding-bottom:8px}
+.scorerow input{text-align:center;font-family:var(--display);font-weight:800;
+  font-size:34px;padding:10px}
+
+.status{font-family:var(--cond);font-weight:600;font-size:14.5px;letter-spacing:.1em;
+  text-transform:uppercase;margin:14px 0 0;min-height:22px}
+.status.good{color:var(--win)} .status.bad{color:var(--loss)} .status.busy{color:var(--gold)}
+.hide{display:none !important}
+
+details.notes{background:var(--panel);border:1px solid var(--line);margin-top:26px}
+details.notes summary{cursor:pointer;padding:16px 22px;font-family:var(--cond);
+  font-weight:700;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+details.notes summary:hover{color:var(--bone)}
+.notes .inner{padding:0 22px 22px;color:var(--mute);font-size:14.5px}
+.notes h3{font-family:var(--display);font-weight:700;font-size:19px;text-transform:uppercase;
+  color:var(--bone);margin:20px 0 7px}
+.notes h3:first-child{margin-top:0}
+.notes ul,.notes ol{padding-left:20px;margin:6px 0}
+.notes li{margin-bottom:6px}
+.notes code{font-family:ui-monospace,Menlo,monospace;font-size:13px;color:var(--gold);
+  background:rgba(254,183,46,.09);padding:1px 6px;word-break:break-word}
+.notes a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="brand" href="index.html">
+    <img src="images/viking-v.png" alt="" onerror="this.style.display='none'">
+    <b>Inglemoor Football</b>
+  </a>
+
+  <h1>Post a score</h1>
+  <p class="sub">Pick the game, type the final, save. That is all this page can do.</p>
+
+  <!-- password -->
+  <div class="card gold" id="loginCard">
+    <label for="pw">Password</label>
+    <input type="password" id="pw" autocomplete="current-password" enterkeyhint="go">
+    <label class="check"><input type="checkbox" id="remember" checked> Remember on this device</label>
+    <button class="btn" id="loginBtn">Continue</button>
+    <p class="status" id="loginStatus"></p>
+  </div>
+
+  <!-- games -->
+  <div class="card hide" id="listCard">
+    <label>This season</label>
+    <div class="games" id="games"></div>
+    <button class="btn ghost" id="forgetBtn" style="margin-top:16px">Forget password on this device</button>
+  </div>
+
+  <!-- entry -->
+  <div class="card gold hide" id="entryCard">
+    <label id="entryLabel"></label>
+    <div class="scorerow">
+      <div>
+        <label for="us" style="text-align:center">Inglemoor</label>
+        <input type="number" id="us" inputmode="numeric" min="0" max="199" enterkeyhint="done">
+      </div>
+      <span class="dash">–</span>
+      <div>
+        <label for="them" id="themLabel" style="text-align:center">Them</label>
+        <input type="number" id="them" inputmode="numeric" min="0" max="199" enterkeyhint="done">
+      </div>
+    </div>
+    <button class="btn" id="saveBtn">Save score</button>
+    <button class="btn ghost" id="cancelBtn" style="margin-top:10px">Back</button>
+    <p class="status" id="saveStatus"></p>
+  </div>
+
+  <details class="notes">
+    <summary>How this site works &mdash; for whoever comes next</summary>
+    <div class="inner">
+
+      <h3>The short version</h3>
+      <p>The whole website is one file, <code>index.html</code>, sitting in a GitHub
+      repository. There is no database, no login, no hosting bill. GitHub publishes it
+      for free every time the file changes.</p>
+
+      <h3>Where it lives</h3>
+      <ul>
+        <li><b>Repository:</b> <code>github.com/inglemoor-football/inglemoor-football.github.io</code></li>
+        <li><b>Site:</b> <code>inglemoorfootball.com</code></li>
+        <li><b>Cost:</b> nothing, apart from the domain renewal at GoDaddy</li>
+      </ul>
+
+      <h3>Changing the site</h3>
+      <p>Everything editable sits in a block called <code>SITE</code> in the first
+      200 lines of <code>index.html</code> &mdash; schedule, coaches, board, sponsors,
+      links. Each part is commented. Edit it on github.com or with GitHub Desktop,
+      commit, and it is live in about a minute.</p>
+
+      <h3>What updates itself</h3>
+      <ul>
+        <li><b>Team calendar</b> &mdash; pulled from the football Google Calendar every hour
+          by a GitHub Action. Change the calendar and the site follows.</li>
+        <li><b>Game states</b> &mdash; the countdown, the "in progress" badge and the
+          "score pending" note are all worked out from kickoff time. Nobody triggers them.</li>
+        <li><b>Record and standings</b> &mdash; calculated from the scores. Post a score
+          and the record, the colours and the next-game countdown all follow.</li>
+      </ul>
+
+      <h3>What needs a person</h3>
+      <ul>
+        <li>Final scores &mdash; this page</li>
+        <li>Rosters, coach changes, sponsor logos</li>
+        <li>The domain renewal, currently paid through August 2034</li>
+      </ul>
+
+      <h3>If something breaks</h3>
+      <p>A blank page almost always means a missing quote or comma in
+      <code>index.html</code>. Every version ever saved is kept: open the file on
+      github.com, click <b>History</b>, find the last good one, and copy it back.
+      Nothing is ever really lost.</p>
+
+      <h3>This page</h3>
+      <p>It talks to a small program on Cloudflare that holds the key to the
+      repository. That program will only change the two score numbers on a game that
+      already exists. It cannot edit anything else, which is deliberate &mdash; a shared
+      password should not be able to rewrite the website.</p>
+
+      <h3>Questions</h3>
+      <p>Start with the board: <a href="mailto:ihsvikingfootball@gmail.com">ihsvikingfootball@gmail.com</a></p>
+
+    </div>
+  </details>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const KEY = "ihs-score-pw";
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let pw = "", games = [], picked = null;
+
+/* ---------- read the schedule straight off the live site ---------- */
+async function loadGames(){
+  const res = await fetch("index.html?" + Date.now(), { cache:"no-store" });
+  const html = await res.text();
+  const re = /\{\s*date:"(\d{4}-\d{2}-\d{2})",\s*time:"(\d{2}:\d{2})",\s*opp:"([^"]*)"[^}]*?at:"(\w+)"[^}]*?\}/g;
+  const out = []; let m;
+  while ((m = re.exec(html)) !== null){
+    const chunk = m[0];
+    const sc = chunk.match(/us:\s*(-?\d+)\s*,\s*them:\s*(-?\d+)/);
+    out.push({
+      date:m[1], time:m[2], opp:m[3], home:m[4]==="home",
+      us: sc ? +sc[1] : null, them: sc ? +sc[2] : null
+    });
+  }
+  return out;
+}
+
+function pretty(d){
+  const p = d.split("-");
+  return MON[+p[1]-1] + " " + (+p[2]);
+}
+
+function renderGames(){
+  $("#games").innerHTML = games.map((g,i) => {
+    const done = g.us !== null;
+    const won = done && g.us > g.them;
+    return '<button class="game' + (done ? " done" : "") + '" data-i="'+i+'">' +
+      '<span><span class="g1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
+      '<span class="g2">' + pretty(g.date) + '</span></span>' +
+      (done
+        ? '<span class="sc ' + (won ? "w" : "l") + '">' + g.us + '–' + g.them + '</span>'
+        : '<span class="sc none">No score</span>') +
+    '</button>';
+  }).join("");
+}
+
+function say(el, msg, kind){ el.textContent = msg; el.className = "status " + (kind||""); }
+
+/* ---------- login ---------- */
+async function enter(){
+  const val = $("#pw").value.trim();
+  if (!val){ say($("#loginStatus"), "Enter the password.", "bad"); return; }
+  pw = val;
+  say($("#loginStatus"), "Loading games…", "busy");
+  try {
+    games = await loadGames();
+  } catch(e){
+    say($("#loginStatus"), "Could not load the schedule.", "bad"); return;
+  }
+  if (!games.length){ say($("#loginStatus"), "No games found on the site.", "bad"); return; }
+  if ($("#remember").checked){ try { localStorage.setItem(KEY, pw); } catch(e){} }
+  $("#loginCard").classList.add("hide");
+  $("#listCard").classList.remove("hide");
+  renderGames();
+}
+
+$("#loginBtn").addEventListener("click", enter);
+$("#pw").addEventListener("keydown", e => { if (e.key === "Enter") enter(); });
+
+$("#forgetBtn").addEventListener("click", () => {
+  try { localStorage.removeItem(KEY); } catch(e){}
+  location.reload();
+});
+
+/* ---------- pick a game ---------- */
+$("#games").addEventListener("click", e => {
+  const b = e.target.closest(".game"); if (!b) return;
+  picked = games[+b.dataset.i];
+  $("#entryLabel").textContent = (picked.home ? "vs " : "at ") + picked.opp + " · " + pretty(picked.date);
+  $("#themLabel").textContent = picked.opp.length > 12 ? "Them" : picked.opp;
+  $("#us").value   = picked.us   !== null ? picked.us   : "";
+  $("#them").value = picked.them !== null ? picked.them : "";
+  $("#listCard").classList.add("hide");
+  $("#entryCard").classList.remove("hide");
+  say($("#saveStatus"), "", "");
+  $("#us").focus();
+});
+
+$("#cancelBtn").addEventListener("click", () => {
+  $("#entryCard").classList.add("hide");
+  $("#listCard").classList.remove("hide");
+});
+
+/* ---------- save ---------- */
+$("#saveBtn").addEventListener("click", async () => {
+  const us = parseInt($("#us").value, 10), them = parseInt($("#them").value, 10);
+  if (!Number.isInteger(us) || !Number.isInteger(them) || us < 0 || them < 0){
+    say($("#saveStatus"), "Both scores are needed.", "bad"); return;
+  }
+  if (WORKER_URL.indexOf("PASTE") === 0){
+    say($("#saveStatus"), "The worker address has not been set in admin.html.", "bad"); return;
+  }
+
+  $("#saveBtn").disabled = true;
+  say($("#saveStatus"), "Saving…", "busy");
+  try {
+    const res = await fetch(WORKER_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ password: pw, date: picked.date, us, them })
+    });
+    const data = await res.json();
+    if (!data.ok){
+      say($("#saveStatus"), data.error || "Save failed.", "bad");
+      if (res.status === 401){ try { localStorage.removeItem(KEY); } catch(e){} }
+      $("#saveBtn").disabled = false;
+      return;
+    }
+    picked.us = us; picked.them = them;
+    renderGames();
+    say($("#saveStatus"), data.message || "Saved.", "good");
+    setTimeout(() => {
+      $("#entryCard").classList.add("hide");
+      $("#listCard").classList.remove("hide");
+      $("#saveBtn").disabled = false;
+    }, 1400);
+  } catch(e){
+    say($("#saveStatus"), "Could not reach the server.", "bad");
+    $("#saveBtn").disabled = false;
+  }
+});
+
+/* ---------- remembered password ---------- */
+(function(){
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch(e){}
+  if (saved){ $("#pw").value = saved; enter(); }
+})();
+})();
+</script>
+</body>
+</html>
