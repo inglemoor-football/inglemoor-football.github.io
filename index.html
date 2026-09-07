@@ -64,7 +64,7 @@ const SITE = {
   photos: {
     show: true,
     worker: "https://inglemoor-scores.grahamcomley.workers.dev",
-    credit: "Photos by the team photographer and Viking families."
+    credit: ""
   },
 
   /* ---- PREVIEW BANNER --------------------------------------
@@ -1057,12 +1057,12 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav">
-      <a href="#team">Team</a>
       <a href="#schedule">Schedule</a>
       <a href="#calendar">Events</a>
       <a href="#donate" class="navgold">Donate</a>
       <a href="#volunteer">Volunteer</a>
       <a href="#coaches">Coaches</a>
+      <a href="#team">Team</a>
       <a href="#photos">Photos</a>
       <a href="#boosters">Boosters</a>
       <a href="#play">Play</a>
@@ -1088,16 +1088,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <div class="cta" id="heroCta"></div>
       </div>
       <div class="heroshot" id="heroShot"></div>
-    </div>
-  </section>
-
-  <!-- TEAM PHOTO -->
-  <section id="team">
-    <div class="wrap">
-      <p class="eyebrow">The squad</p>
-      <h2 class="sec">2026 team photo</h2>
-      <p class="lede">Varsity, JV, and the coaching staff. One frame, one program.</p>
-      <div id="teamMount"></div>
     </div>
   </section>
 
@@ -1168,6 +1158,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </div>
   </section>
 
+  <!-- TEAM PHOTO -->
+  <section id="team">
+    <div class="wrap">
+      <p class="eyebrow">The squad</p>
+      <h2 class="sec">2026 team photo</h2>
+      <p class="lede">Varsity, JV, and the coaching staff. One frame, one program.</p>
+      <div id="teamMount"></div>
+    </div>
+  </section>
+
   <!-- PHOTOS -->
   <section id="photos">
     <div class="wrap">
@@ -1176,7 +1176,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <p class="lede" id="phLede"></p>
       <div class="pills" id="phPills"></div>
       <div class="grid" id="phGrid"></div>
-      <p class="credit" id="phCredit"></p>
     </div>
   </section>
 
@@ -1345,9 +1344,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     if (SITE.heroImage){
       $("#heroShot").innerHTML = '<img src="'+SITE.heroImage+'" alt="Inglemoor Viking football" ' +
         'onerror="this.parentNode.remove()">';
-    } else {
-      $("#heroShot").remove();
     }
+    // if nothing is set here, the photos code may still fill it from R2
 
     // countdown, or a live badge once it has kicked off
     const box = $("#clock");
@@ -1722,7 +1720,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     // only games that actually have photos
     const withPhotos = games.filter(g => !g.tbd && counts[g.date] > 0);
     if (!withPhotos.length){
-      $("#phLede").textContent = cfg.credit || "";
       $("#phGrid").innerHTML = '<div class="empty"><h4>Photos coming soon</h4>' +
         '<p>Game photos will appear here through the season.</p></div>';
       return;
@@ -1742,9 +1739,15 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     function layout(){
       const wrap = $("#phGrid");
       const W = wrap.clientWidth || 900;
-      const gap = 6, target = W < 640 ? 150 : 230;
+      const gap = 6, base = W < 640 ? 170 : 250;
+      // Rows alternate between taller and shorter, which changes how many
+      // photos fit on each one. Without this a set of identically shaped
+      // photos lays out as a plain equal grid.
+      const rhythm = W < 640 ? [1, 0.8] : [1, 0.8, 1.2];
+      let rowNo = 0;
+      const targetFor = n => base * rhythm[n % rhythm.length];
       wrap.innerHTML = "";
-      let row = [], sum = 0;
+      let row = [], sum = 0, target = targetFor(0);
       const flush = last => {
         if (!row.length) return;
         const avail = W - gap*(row.length-1);
@@ -1766,8 +1769,22 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         wrap.appendChild(div);
         row = []; sum = 0;
       };
-      shots.forEach((s,i) => { s.i=i; row.push(s); sum += s.r; if (sum*target >= W) flush(false); });
-      flush(true);
+      const plan = [];
+      shots.forEach((s,i) => {
+        s.i = i; row.push(s); sum += s.r;
+        if (sum*target >= W){ plan.push(row); row = []; sum = 0; rowNo++; target = targetFor(rowNo); }
+      });
+      if (row.length) plan.push(row);
+      // a lone photo on the last row looks like a mistake — borrow one back
+      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
+        plan[plan.length-1].unshift(plan[plan.length-2].pop());
+      }
+      rowNo = 0;
+      plan.forEach((r,i) => {
+        row = r; sum = r.reduce((t,x) => t + x.r, 0);
+        target = targetFor(i);
+        flush(i === plan.length-1);
+      });
     }
 
     async function pick(k){
@@ -1782,7 +1799,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           r: (f.w && f.h) ? (f.w/f.h) : 1.5
         }));
       } catch(e){ shots = []; }
-      $("#phCredit").textContent = cfg.credit || "";
       layout();
     }
 

@@ -203,7 +203,7 @@ details.notes summary:hover{color:var(--bone)}
     <div class="heroprev" id="heroPrev">None set</div>
     <div class="drop" id="heroDrop" style="padding:22px">
       <b style="font-size:18px">Replace hero</b>
-      <span>One wide action shot</span>
+      <span>Drop it here or tap to choose &middot; one wide action shot</span>
       <input type="file" id="heroPicker" accept="image/*" hidden>
     </div>
     <p class="status" id="heroStatus"></p>
@@ -445,6 +445,40 @@ $("#existing").addEventListener("click", async e => {
 });
 
 /* ---------- resize in the browser ---------- */
+function drawTo(img, maxSide){
+  let { width:w, height:h } = img;
+  const scale = Math.min(1, maxSide / Math.max(w, h));
+  w = Math.round(w*scale); h = Math.round(h*scale);
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  c.getContext("2d").drawImage(img, 0, 0, w, h);
+  return { canvas:c, w, h };
+}
+const toBlob = c => new Promise((res,rej) =>
+  c.toBlob(b => b ? res(b) : rej(new Error("resize failed")), "image/jpeg", JPEG_Q));
+
+// One decode, one big resize, then the thumbnail comes off that result
+// rather than off the original. Roughly halves the work per photo.
+function shrinkBoth(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = async () => {
+      URL.revokeObjectURL(url);
+      try {
+        const big = drawTo(img, MAXW);
+        const sm  = drawTo(big.canvas, THUMB);   // canvas works as a source too
+        resolve({
+          big: { blob: await toBlob(big.canvas), w: big.w, h: big.h },
+          sm:  { blob: await toBlob(sm.canvas),  w: sm.w,  h: sm.h }
+        });
+      } catch(e){ reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("could not read image")); };
+    img.src = url;
+  });
+}
+
 function shrink(file, maxSide){
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -532,8 +566,7 @@ $("#upBtn").addEventListener("click", async () => {
                   q.file, q.file.type);
       } else {
         q.pct = 20; renderQueue();
-        const big = await shrink(q.file, MAXW);
-        const sm  = await shrink(q.file, THUMB);
+        const { big, sm } = await shrinkBoth(q.file);
         const name = stamp(i) + ".jpg";
         q.pct = 55; renderQueue();
         await put({ action:"upload", game:picked.date, name, kind:"photo", w:big.w, h:big.h },
@@ -560,8 +593,16 @@ $("#upBtn").addEventListener("click", async () => {
 
 /* ---------- hero ---------- */
 $("#heroDrop").addEventListener("click", () => $("#heroPicker").click());
-$("#heroPicker").addEventListener("change", async e => {
-  const f = e.target.files[0]; if (!f) return;
+["dragover","dragenter"].forEach(ev =>
+  $("#heroDrop").addEventListener(ev, e => { e.preventDefault(); $("#heroDrop").classList.add("over"); }));
+["dragleave","drop"].forEach(ev =>
+  $("#heroDrop").addEventListener(ev, e => { e.preventDefault(); $("#heroDrop").classList.remove("over"); }));
+$("#heroDrop").addEventListener("drop", e => sendHero(e.dataTransfer.files[0]));
+$("#heroPicker").addEventListener("change", e => sendHero(e.target.files[0]));
+
+async function sendHero(f){
+  {
+    if (!f || !/^image\//.test(f.type)) return;
   say($("#heroStatus"), "Uploading…", "busy");
   try {
     const big = await shrink(f, 2400);
@@ -572,7 +613,8 @@ $("#heroPicker").addEventListener("change", async e => {
   } catch(err){
     say($("#heroStatus"), "Upload failed: " + err.message, "bad");
   }
-});
+  }
+}
 
 /* ---------- remembered password ---------- */
 (function(){
