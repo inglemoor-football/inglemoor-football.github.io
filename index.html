@@ -56,6 +56,17 @@ const SITE = {
     note: "Everything the team calendar holds — practices, dinners, and every game."
   },
 
+  /* ---- PHOTOS ----------------------------------------------
+     Photos and video live in Cloudflare R2 and are uploaded
+     from admin.html. Nothing to edit here — the site asks the
+     Worker what exists and builds the gallery from that.
+     --------------------------------------------------------- */
+  photos: {
+    show: true,
+    worker: "https://inglemoor-scores.grahamcomley.workers.dev",
+    credit: "Photos by the team photographer and Viking families."
+  },
+
   /* ---- PREVIEW BANNER --------------------------------------
      Set show:false when the domain moves and the site goes
      public. That is the only change needed — the banner and
@@ -721,6 +732,57 @@ nav a.navgold:hover{color:#FFC754}
   .mdow{padding:7px 2px;font-size:10px;letter-spacing:.08em}
 }
 
+/* ---------- photos ---------- */
+.pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:22px;
+  scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
+.pills::-webkit-scrollbar{height:6px}
+.pills::-webkit-scrollbar-thumb{background:var(--line2)}
+.pill{flex:0 0 auto;background:transparent;border:1px solid var(--line2);color:var(--mute);
+  padding:11px 18px;cursor:pointer;text-align:left;font-family:var(--cond);transition:.15s}
+.pill:hover{border-color:var(--gold-deep);color:var(--bone)}
+.pill[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.pill .p1{display:block;font-weight:700;font-size:15px;letter-spacing:.07em;text-transform:uppercase}
+.pill .p2{display:block;font-weight:600;font-size:11.5px;letter-spacing:.15em;
+  text-transform:uppercase;opacity:.72;margin-top:2px}
+
+.grid{display:flex;flex-direction:column;gap:6px}
+.grid .row{display:flex;gap:6px}
+.tile{position:relative;overflow:hidden;background:var(--panel2);cursor:pointer;
+  border:1px solid transparent;transition:border-color .15s}
+.tile:hover{border-color:var(--gold)}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--cond);
+  font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.tile.vid::after{content:"";position:absolute;left:12px;bottom:12px;width:0;height:0;
+  border-left:13px solid var(--bone);border-top:8px solid transparent;
+  border-bottom:8px solid transparent;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.credit{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--line2);margin:18px 0 0}
+.photolink{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--gold);text-decoration:none;white-space:nowrap;
+  border:1px solid var(--gold-deep);padding:6px 13px}
+.photolink:hover{background:var(--gold);color:var(--ink)}
+
+.plb{position:fixed;inset:0;z-index:210;background:rgba(10,11,13,.97);display:none;
+  grid-template-rows:1fr auto;padding:22px}
+.plb.on{display:grid}
+.plbstage{display:grid;place-items:center;position:relative;min-height:0}
+.plbbox{max-width:min(92vw,1200px);max-height:100%;display:grid;place-items:center}
+.plbbox img,.plbbox video{max-width:100%;max-height:78vh;display:block}
+.plbnav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,11,13,.6);
+  border:1px solid var(--line2);color:var(--bone);font-size:22px;width:46px;height:46px;
+  cursor:pointer;display:grid;place-items:center}
+.plbnav:hover{border-color:var(--gold);color:var(--gold)}
+.plbnav.prev{left:0} .plbnav.next{right:0}
+.plbfoot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;
+  font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mute)}
+.plbclose{background:transparent;border:1px solid var(--line2);color:var(--bone);
+  font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.15em;
+  text-transform:uppercase;padding:9px 18px;cursor:pointer}
+.plbclose:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:640px){.plbnav{width:38px;height:38px;font-size:18px}}
+
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--line2);margin-bottom:10px}
@@ -1001,6 +1063,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <a href="#donate" class="navgold">Donate</a>
       <a href="#volunteer">Volunteer</a>
       <a href="#coaches">Coaches</a>
+      <a href="#photos">Photos</a>
       <a href="#boosters">Boosters</a>
       <a href="#play">Play</a>
       <a href="#archive">History</a>
@@ -1102,6 +1165,18 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <h2 class="sec">Coaches</h2>
       <p class="lede">The people running practice, calling plays and keeping players healthy.</p>
       <div class="rv" id="coachGrid"></div>
+    </div>
+  </section>
+
+  <!-- PHOTOS -->
+  <section id="photos">
+    <div class="wrap">
+      <p class="eyebrow">From the sideline</p>
+      <h2 class="sec">Photos</h2>
+      <p class="lede" id="phLede"></p>
+      <div class="pills" id="phPills"></div>
+      <div class="grid" id="phGrid"></div>
+      <p class="credit" id="phCredit"></p>
     </div>
   </section>
 
@@ -1624,6 +1699,153 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '<a class="btn" href="' + (SITE.links.register || "#") + '" target="_blank" rel="noopener">' +
         (r.ctaLabel || "Athletics registration") + '</a>' +
     '</div>';
+  })();
+
+  /* ---- PHOTOS ---- */
+  (async function(){
+    const cfg = SITE.photos;
+    if (!cfg || !cfg.show || !cfg.worker){ const n=$("#photos"); if(n) n.remove(); return; }
+    const api = p => cfg.worker + "?" + new URLSearchParams(p).toString();
+
+    let counts = {};
+    try {
+      const r = await fetch(api({action:"counts"}));
+      const d = await r.json();
+      if (d.ok) counts = d.counts || {};
+      if (d.ok && d.hero && !SITE.heroImage){
+        const shot = $("#heroShot");
+        if (shot) shot.innerHTML = '<img src="'+api({action:"img",key:"hero/current.jpg"})+'" ' +
+          'alt="Inglemoor Viking football" onerror="this.parentNode.remove()">';
+      }
+    } catch(e){}
+
+    // only games that actually have photos
+    const withPhotos = games.filter(g => !g.tbd && counts[g.date] > 0);
+    if (!withPhotos.length){
+      $("#phLede").textContent = cfg.credit || "";
+      $("#phGrid").innerHTML = '<div class="empty"><h4>Photos coming soon</h4>' +
+        '<p>Game photos will appear here through the season.</p></div>';
+      return;
+    }
+    withPhotos.reverse();                      // newest game first
+
+    $("#phLede").textContent = "Game by game, through the season.";
+    $("#phPills").innerHTML = withPhotos.map((g,i) =>
+      '<button class="pill" aria-pressed="'+(i===0)+'" data-i="'+i+'">' +
+        '<span class="p1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
+        '<span class="p2">' + MON[g.when.getMonth()] + ' ' + g.when.getDate() +
+          ' · ' + counts[g.date] + '</span>' +
+      '</button>').join("");
+
+    let shots = [], active = 0;
+
+    function layout(){
+      const wrap = $("#phGrid");
+      const W = wrap.clientWidth || 900;
+      const gap = 6, target = W < 640 ? 150 : 230;
+      wrap.innerHTML = "";
+      let row = [], sum = 0;
+      const flush = last => {
+        if (!row.length) return;
+        const avail = W - gap*(row.length-1);
+        let h = avail / sum;
+        if (last && h > target*1.45) h = target;
+        const div = document.createElement("div");
+        div.className = "row";
+        row.forEach(s => {
+          const t = document.createElement("div");
+          t.className = "tile" + (s.video ? " vid" : "");
+          t.style.width = Math.floor(h*s.r) + "px";
+          t.style.height = Math.floor(h) + "px";
+          t.dataset.i = s.i;
+          t.innerHTML = s.video
+            ? '<span class="ph">Video</span>'
+            : '<img src="'+api({action:"img",key:s.thumb})+'" alt="" loading="lazy">';
+          div.appendChild(t);
+        });
+        wrap.appendChild(div);
+        row = []; sum = 0;
+      };
+      shots.forEach((s,i) => { s.i=i; row.push(s); sum += s.r; if (sum*target >= W) flush(false); });
+      flush(true);
+    }
+
+    async function pick(k){
+      active = k;
+      $("#phPills").querySelectorAll(".pill").forEach((p,i) => p.setAttribute("aria-pressed", i===k));
+      $("#phGrid").innerHTML = '<p class="credit">Loading…</p>';
+      try {
+        const r = await fetch(api({action:"list", game: withPhotos[k].date}));
+        const d = await r.json();
+        shots = (d.files||[]).map(f => ({
+          key:f.key, thumb:f.thumb, video:f.video,
+          r: (f.w && f.h) ? (f.w/f.h) : 1.5
+        }));
+      } catch(e){ shots = []; }
+      $("#phCredit").textContent = cfg.credit || "";
+      layout();
+    }
+
+    $("#phPills").addEventListener("click", e => {
+      const b = e.target.closest(".pill"); if (!b) return;
+      pick(+b.dataset.i);
+    });
+    addEventListener("resize", () => { if (shots.length) layout(); });
+
+    /* lightbox, reusing the coach one's shape */
+    const lb = document.createElement("div");
+    lb.className = "plb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true");
+    lb.innerHTML = '<div class="plbstage">' +
+        '<button class="plbnav prev" aria-label="Previous">&larr;</button>' +
+        '<div class="plbbox" id="plbBox"></div>' +
+        '<button class="plbnav next" aria-label="Next">&rarr;</button>' +
+      '</div>' +
+      '<div class="plbfoot"><span id="plbMeta"></span>' +
+        '<button class="plbclose">Close</button></div>';
+    document.body.appendChild(lb);
+
+    let at = 0;
+    function open(i){
+      at = (i + shots.length) % shots.length;
+      const s = shots[at];
+      lb.querySelector("#plbBox").innerHTML = s.video
+        ? '<video src="'+api({action:"img",key:s.key})+'" controls autoplay playsinline></video>'
+        : '<img src="'+api({action:"img",key:s.key})+'" alt="">';
+      lb.querySelector("#plbMeta").textContent =
+        (withPhotos[active].home?"vs ":"at ") + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
+      lb.classList.add("on");
+    }
+    const close = () => { lb.classList.remove("on"); lb.querySelector("#plbBox").innerHTML = ""; };
+
+    $("#phGrid").addEventListener("click", e => {
+      const t = e.target.closest(".tile"); if (!t) return;
+      open(+t.dataset.i);
+    });
+    lb.addEventListener("click", e => {
+      if (e.target === lb || e.target.closest(".plbclose")) return close();
+      if (e.target.closest(".prev")) return open(at-1);
+      if (e.target.closest(".next")) return open(at+1);
+    });
+    document.addEventListener("keydown", e => {
+      if (!lb.classList.contains("on")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") open(at-1);
+      if (e.key === "ArrowRight") open(at+1);
+    });
+
+    // a Photos link on each played game in the schedule
+    document.querySelectorAll("#schedBody tr").forEach((tr,i) => {
+      const g = games[i]; if (!g || !counts[g.date]) return;
+      const cell = tr.lastElementChild; if (!cell) return;
+      const k = withPhotos.findIndex(x => x.date === g.date); if (k < 0) return;
+      cell.innerHTML = '<a class="photolink" href="#photos" data-jump="'+k+'">Photos · ' + counts[g.date] + '</a>';
+    });
+    document.addEventListener("click", e => {
+      const a = e.target.closest("[data-jump]"); if (!a) return;
+      pick(+a.dataset.jump);
+    });
+
+    pick(0);
   })();
 
   /* ---- BOOSTERS ---- */

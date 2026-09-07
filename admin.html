@@ -65,18 +65,24 @@ input:focus{border-color:var(--gold);outline:none}
 
 .games{display:grid;gap:2px}
 .game{background:var(--ink);border:1px solid var(--line);border-left:3px solid var(--line2);
-  padding:15px 17px;display:grid;grid-template-columns:1fr auto;gap:12px;
-  align-items:center;cursor:pointer;text-align:left;width:100%;color:inherit;
-  font-family:inherit;font-size:inherit}
-.game:hover{background:var(--panel2);border-left-color:var(--gold)}
+  padding:14px 16px;display:grid;grid-template-columns:1fr auto auto;gap:14px;
+  align-items:center;width:100%}
 .game.done{border-left-color:var(--win)}
 .game .g1{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.03em}
 .game .g2{font-family:var(--cond);font-weight:600;font-size:12.5px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--mute);margin-top:2px}
-.game .sc{font-family:var(--display);font-weight:800;font-size:22px;white-space:nowrap}
-.game .sc.w{color:var(--win)} .game .sc.l{color:var(--loss)}
-.game .sc.none{font-family:var(--cond);font-weight:600;font-size:12px;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--line2)}
+.gbtn{font-family:var(--cond);font-weight:700;font-size:12.5px;letter-spacing:.13em;
+  text-transform:uppercase;background:transparent;border:1px solid var(--line2);
+  color:var(--mute);padding:9px 14px;cursor:pointer;white-space:nowrap;min-width:96px}
+.gbtn:hover{border-color:var(--gold);color:var(--gold)}
+.gbtn.has{border-color:var(--gold-deep);color:var(--gold)}
+.gbtn .n{font-family:var(--display);font-weight:800;font-size:17px;display:block;line-height:1}
+.gbtn.score.w{border-color:var(--win);color:var(--win)}
+.gbtn.score.l{border-color:var(--loss);color:var(--loss)}
+@media(max-width:520px){
+  .game{grid-template-columns:1fr auto;gap:10px}
+  .game .gbtn:last-child{grid-column:2}
+}
 
 .scorerow{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:end;margin-top:6px}
 .scorerow .dash{font-family:var(--display);font-weight:800;font-size:30px;
@@ -88,6 +94,30 @@ input:focus{border-color:var(--gold);outline:none}
   text-transform:uppercase;margin:14px 0 0;min-height:22px}
 .status.good{color:var(--win)} .status.bad{color:var(--loss)} .status.busy{color:var(--gold)}
 .hide{display:none !important}
+
+.drop{border:1px dashed var(--line2);background:var(--ink);padding:30px 20px;
+  text-align:center;cursor:pointer;transition:.18s;margin-top:4px}
+.drop:hover,.drop.over{border-color:var(--gold);background:var(--panel2)}
+.drop b{display:block;font-family:var(--display);font-weight:700;font-size:21px;
+  text-transform:uppercase;margin-bottom:4px}
+.drop span{color:var(--mute);font-size:14px}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin-top:14px}
+.q{position:relative;aspect-ratio:1;background:var(--panel2);overflow:hidden}
+.q img{width:100%;height:100%;object-fit:cover;display:block}
+.q .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(0,0,0,.5)}
+.q .bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .25s}
+.q .x{position:absolute;right:4px;top:4px;width:20px;height:20px;background:rgba(0,0,0,.7);
+  border:none;color:var(--bone);cursor:pointer;font-size:14px;line-height:1;
+  display:grid;place-items:center;padding:0}
+.q .x:hover{background:var(--loss);color:var(--ink)}
+.q.vid::before{content:"";position:absolute;left:7px;bottom:8px;width:0;height:0;
+  border-left:10px solid var(--bone);border-top:6px solid transparent;
+  border-bottom:6px solid transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.7))}
+.q.ok{outline:2px solid var(--win);outline-offset:-2px}
+.heroprev{width:100%;aspect-ratio:21/9;background:var(--panel2);display:grid;place-items:center;
+  font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--line2);margin-bottom:12px;overflow:hidden}
+.heroprev img{width:100%;height:100%;object-fit:cover}
 
 details.notes{background:var(--panel);border:1px solid var(--line);margin-top:26px}
 details.notes summary{cursor:pointer;padding:16px 22px;font-family:var(--cond);
@@ -148,6 +178,35 @@ details.notes summary:hover{color:var(--bone)}
     <button class="btn" id="saveBtn">Save score</button>
     <button class="btn ghost" id="cancelBtn" style="margin-top:10px">Back</button>
     <p class="status" id="saveStatus"></p>
+  </div>
+
+  <!-- photos -->
+  <div class="card gold hide" id="photoCard">
+    <label id="photoLabel"></label>
+    <div class="drop" id="drop">
+      <b>Drop photos or video here</b>
+      <span>or tap to choose &middot; JPG, PNG, MP4</span>
+      <input type="file" id="picker" multiple accept="image/*,video/mp4,video/quicktime" hidden>
+    </div>
+    <div class="qgrid" id="queue"></div>
+    <button class="btn hide" id="upBtn">Upload</button>
+    <p class="note">Photos are shrunk here before uploading. The originals stay on your device.</p>
+    <label style="margin-top:22px">Already on this game</label>
+    <div class="qgrid" id="existing"></div>
+    <button class="btn ghost" id="photoBack" style="margin-top:16px">Back</button>
+    <p class="status" id="photoStatus"></p>
+  </div>
+
+  <!-- hero -->
+  <div class="card hide" id="heroCard">
+    <label>Hero image &mdash; top of the site</label>
+    <div class="heroprev" id="heroPrev">None set</div>
+    <div class="drop" id="heroDrop" style="padding:22px">
+      <b style="font-size:18px">Replace hero</b>
+      <span>One wide action shot</span>
+      <input type="file" id="heroPicker" accept="image/*" hidden>
+    </div>
+    <p class="status" id="heroStatus"></p>
   </div>
 
   <details class="notes">
@@ -215,127 +274,303 @@ details.notes summary:hover{color:var(--bone)}
 const $ = s => document.querySelector(s);
 const KEY = "ihs-score-pw";
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-let pw = "", games = [], picked = null;
+const MAXW = 2000, THUMB = 400, JPEG_Q = 0.85;
+let pw = "", games = [], counts = {}, picked = null, queue = [];
 
-/* ---------- read the schedule straight off the live site ---------- */
+const api = (params) => WORKER_URL + "?" + new URLSearchParams(params).toString();
+const say = (el,msg,kind) => { el.textContent = msg; el.className = "status " + (kind||""); };
+const pretty = d => { const p = d.split("-"); return MON[+p[1]-1] + " " + (+p[2]); };
+const show = (id,on) => $(id).classList.toggle("hide", !on);
+
+/* ---------- read the schedule from the live site ---------- */
 async function loadGames(){
   const res = await fetch("index.html?" + Date.now(), { cache:"no-store" });
   const html = await res.text();
   const re = /\{\s*date:"(\d{4}-\d{2}-\d{2})",\s*time:"(\d{2}:\d{2})",\s*opp:"([^"]*)"[^}]*?at:"(\w+)"[^}]*?\}/g;
   const out = []; let m;
   while ((m = re.exec(html)) !== null){
-    const chunk = m[0];
-    const sc = chunk.match(/us:\s*(-?\d+)\s*,\s*them:\s*(-?\d+)/);
-    out.push({
-      date:m[1], time:m[2], opp:m[3], home:m[4]==="home",
-      us: sc ? +sc[1] : null, them: sc ? +sc[2] : null
-    });
+    const sc = m[0].match(/us:\s*(-?\d+)\s*,\s*them:\s*(-?\d+)/);
+    out.push({ date:m[1], opp:m[3], home:m[4]==="home",
+               us: sc?+sc[1]:null, them: sc?+sc[2]:null });
   }
   return out;
 }
 
-function pretty(d){
-  const p = d.split("-");
-  return MON[+p[1]-1] + " " + (+p[2]);
+async function loadCounts(){
+  try {
+    const r = await fetch(api({action:"counts"}));
+    const d = await r.json();
+    if (d.ok){ counts = d.counts || {}; return d.hero; }
+  } catch(e){}
+  return false;
 }
 
+/* ---------- the game list ---------- */
 function renderGames(){
   $("#games").innerHTML = games.map((g,i) => {
-    const done = g.us !== null;
-    const won = done && g.us > g.them;
-    return '<button class="game' + (done ? " done" : "") + '" data-i="'+i+'">' +
+    const done = g.us !== null, won = done && g.us > g.them;
+    const n = counts[g.date] || 0;
+    return '<div class="game' + (done ? " done" : "") + '">' +
       '<span><span class="g1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
-      '<span class="g2">' + pretty(g.date) + '</span></span>' +
-      (done
-        ? '<span class="sc ' + (won ? "w" : "l") + '">' + g.us + '–' + g.them + '</span>'
-        : '<span class="sc none">No score</span>') +
-    '</button>';
+        '<span class="g2">' + pretty(g.date) + '</span></span>' +
+      '<button class="gbtn score ' + (done ? (won?"w":"l") : "") + '" data-score="'+i+'">' +
+        (done ? '<span class="n">' + g.us + '–' + g.them + '</span>Score' : 'Add score') +
+      '</button>' +
+      '<button class="gbtn ' + (n ? "has" : "") + '" data-photos="'+i+'">' +
+        (n ? '<span class="n">' + n + '</span>Photos' : 'Photos') +
+      '</button>' +
+    '</div>';
   }).join("");
 }
-
-function say(el, msg, kind){ el.textContent = msg; el.className = "status " + (kind||""); }
 
 /* ---------- login ---------- */
 async function enter(){
   const val = $("#pw").value.trim();
   if (!val){ say($("#loginStatus"), "Enter the password.", "bad"); return; }
   pw = val;
-  say($("#loginStatus"), "Loading games…", "busy");
-  try {
-    games = await loadGames();
-  } catch(e){
-    say($("#loginStatus"), "Could not load the schedule.", "bad"); return;
-  }
-  if (!games.length){ say($("#loginStatus"), "No games found on the site.", "bad"); return; }
+  say($("#loginStatus"), "Loading…", "busy");
+  try { games = await loadGames(); }
+  catch(e){ say($("#loginStatus"), "Could not load the schedule.", "bad"); return; }
+  if (!games.length){ say($("#loginStatus"), "No games found.", "bad"); return; }
+  const hasHero = await loadCounts();
   if ($("#remember").checked){ try { localStorage.setItem(KEY, pw); } catch(e){} }
-  $("#loginCard").classList.add("hide");
-  $("#listCard").classList.remove("hide");
+  show("#loginCard", false); show("#listCard", true); show("#heroCard", true);
+  if (hasHero) $("#heroPrev").innerHTML = '<img src="'+api({action:"img",key:"hero/current.jpg"})+'" alt="">';
   renderGames();
 }
-
 $("#loginBtn").addEventListener("click", enter);
 $("#pw").addEventListener("keydown", e => { if (e.key === "Enter") enter(); });
-
 $("#forgetBtn").addEventListener("click", () => {
   try { localStorage.removeItem(KEY); } catch(e){}
   location.reload();
 });
 
-/* ---------- pick a game ---------- */
+/* ---------- row buttons ---------- */
 $("#games").addEventListener("click", e => {
-  const b = e.target.closest(".game"); if (!b) return;
-  picked = games[+b.dataset.i];
-  $("#entryLabel").textContent = (picked.home ? "vs " : "at ") + picked.opp + " · " + pretty(picked.date);
-  $("#themLabel").textContent = picked.opp.length > 12 ? "Them" : picked.opp;
-  $("#us").value   = picked.us   !== null ? picked.us   : "";
-  $("#them").value = picked.them !== null ? picked.them : "";
-  $("#listCard").classList.add("hide");
-  $("#entryCard").classList.remove("hide");
-  say($("#saveStatus"), "", "");
-  $("#us").focus();
+  const sc = e.target.closest("[data-score]"), ph = e.target.closest("[data-photos]");
+  if (sc){ openScore(games[+sc.dataset.score]); }
+  else if (ph){ openPhotos(games[+ph.dataset.photos]); }
 });
 
+/* ---------- score ---------- */
+function openScore(g){
+  picked = g;
+  $("#entryLabel").textContent = (g.home?"vs ":"at ") + g.opp + " · " + pretty(g.date);
+  $("#themLabel").textContent = g.opp.length > 12 ? "Them" : g.opp;
+  $("#us").value   = g.us   !== null ? g.us   : "";
+  $("#them").value = g.them !== null ? g.them : "";
+  show("#listCard", false); show("#heroCard", false); show("#entryCard", true);
+  say($("#saveStatus"), "", ""); $("#us").focus();
+}
 $("#cancelBtn").addEventListener("click", () => {
-  $("#entryCard").classList.add("hide");
-  $("#listCard").classList.remove("hide");
+  show("#entryCard", false); show("#listCard", true); show("#heroCard", true);
 });
-
-/* ---------- save ---------- */
 $("#saveBtn").addEventListener("click", async () => {
-  const us = parseInt($("#us").value, 10), them = parseInt($("#them").value, 10);
-  if (!Number.isInteger(us) || !Number.isInteger(them) || us < 0 || them < 0){
+  const us = parseInt($("#us").value,10), them = parseInt($("#them").value,10);
+  if (!Number.isInteger(us) || !Number.isInteger(them) || us<0 || them<0){
     say($("#saveStatus"), "Both scores are needed.", "bad"); return;
   }
-  if (WORKER_URL.indexOf("PASTE") === 0){
-    say($("#saveStatus"), "The worker address has not been set in admin.html.", "bad"); return;
-  }
-
   $("#saveBtn").disabled = true;
   say($("#saveStatus"), "Saving…", "busy");
   try {
-    const res = await fetch(WORKER_URL, {
+    const res = await fetch(api({action:"score"}), {
       method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ password: pw, date: picked.date, us, them })
+      headers:{ "Content-Type":"application/json", "X-Auth": pw },
+      body: JSON.stringify({ date: picked.date, us, them })
     });
-    const data = await res.json();
-    if (!data.ok){
-      say($("#saveStatus"), data.error || "Save failed.", "bad");
-      if (res.status === 401){ try { localStorage.removeItem(KEY); } catch(e){} }
-      $("#saveBtn").disabled = false;
-      return;
+    const d = await res.json();
+    if (!d.ok){
+      say($("#saveStatus"), d.error || "Save failed.", "bad");
+      if (res.status === 401){ try{ localStorage.removeItem(KEY); }catch(e){} }
+      $("#saveBtn").disabled = false; return;
     }
-    picked.us = us; picked.them = them;
-    renderGames();
-    say($("#saveStatus"), data.message || "Saved.", "good");
+    picked.us = us; picked.them = them; renderGames();
+    say($("#saveStatus"), d.message || "Saved.", "good");
     setTimeout(() => {
-      $("#entryCard").classList.add("hide");
-      $("#listCard").classList.remove("hide");
+      show("#entryCard", false); show("#listCard", true); show("#heroCard", true);
       $("#saveBtn").disabled = false;
     }, 1400);
   } catch(e){
     say($("#saveStatus"), "Could not reach the server.", "bad");
     $("#saveBtn").disabled = false;
+  }
+});
+
+/* ---------- photos ---------- */
+async function openPhotos(g){
+  picked = g; queue = [];
+  $("#photoLabel").textContent = "Photos · " + (g.home?"vs ":"at ") + g.opp + " · " + pretty(g.date);
+  $("#queue").innerHTML = ""; show("#upBtn", false);
+  say($("#photoStatus"), "", "");
+  show("#listCard", false); show("#heroCard", false); show("#photoCard", true);
+  await refreshExisting();
+}
+$("#photoBack").addEventListener("click", async () => {
+  await loadCounts(); renderGames();
+  show("#photoCard", false); show("#listCard", true); show("#heroCard", true);
+});
+
+async function refreshExisting(){
+  const el = $("#existing");
+  el.innerHTML = '<p class="note" style="grid-column:1/-1;margin:0">Loading…</p>';
+  try {
+    const r = await fetch(api({action:"list", game:picked.date}));
+    const d = await r.json();
+    if (!d.ok || !d.files.length){
+      el.innerHTML = '<p class="note" style="grid-column:1/-1;margin:0">Nothing uploaded yet.</p>';
+      return;
+    }
+    el.innerHTML = d.files.map(f =>
+      '<div class="q' + (f.video ? " vid" : "") + '">' +
+        (f.video ? '' : '<img src="'+api({action:"img",key:f.thumb})+'" alt="" loading="lazy">') +
+        '<button class="x" data-del="'+f.key+'" title="Remove">&times;</button>' +
+      '</div>').join("");
+  } catch(e){
+    el.innerHTML = '<p class="note" style="grid-column:1/-1;margin:0">Could not load.</p>';
+  }
+}
+
+$("#existing").addEventListener("click", async e => {
+  const b = e.target.closest("[data-del]"); if (!b) return;
+  if (!confirm("Remove this from the site?")) return;
+  b.disabled = true;
+  try {
+    const r = await fetch(api({action:"delete", key:b.dataset.del}), {
+      method:"POST", headers:{ "X-Auth": pw }
+    });
+    const d = await r.json();
+    if (d.ok) await refreshExisting();
+    else say($("#photoStatus"), d.error || "Could not remove it.", "bad");
+  } catch(e){ say($("#photoStatus"), "Could not reach the server.", "bad"); }
+});
+
+/* ---------- resize in the browser ---------- */
+function shrink(file, maxSide){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width:w, height:h } = img;
+      const scale = Math.min(1, maxSide / Math.max(w, h));
+      w = Math.round(w * scale); h = Math.round(h * scale);
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      c.toBlob(blob => blob ? resolve({ blob, w, h }) : reject(new Error("resize failed")),
+               "image/jpeg", JPEG_Q);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("could not read image")); };
+    img.src = url;
+  });
+}
+
+function stamp(i){
+  return Date.now().toString(36) + i.toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+/* ---------- queue ---------- */
+$("#drop").addEventListener("click", () => $("#picker").click());
+$("#picker").addEventListener("change", e => addFiles([...e.target.files]));
+["dragover","dragenter"].forEach(ev =>
+  $("#drop").addEventListener(ev, e => { e.preventDefault(); $("#drop").classList.add("over"); }));
+["dragleave","drop"].forEach(ev =>
+  $("#drop").addEventListener(ev, e => { e.preventDefault(); $("#drop").classList.remove("over"); }));
+$("#drop").addEventListener("drop", e => addFiles([...e.dataTransfer.files]));
+
+function addFiles(files){
+  files.forEach(f => {
+    if (!/^image\//.test(f.type) && !/^video\//.test(f.type)) return;
+    queue.push({ file:f, video:/^video\//.test(f.type), pct:0, done:false });
+  });
+  renderQueue();
+  show("#upBtn", queue.length > 0);
+  $("#upBtn").textContent = "Upload " + queue.length + " file" + (queue.length===1?"":"s");
+}
+
+function renderQueue(){
+  $("#queue").innerHTML = queue.map((q,i) =>
+    '<div class="q' + (q.video?" vid":"") + (q.done?" ok":"") + '" data-q="'+i+'">' +
+      (q.video ? '' : '<img src="'+URL.createObjectURL(q.file)+'" alt="">') +
+      (q.done ? '' : '<button class="x" data-drop="'+i+'">&times;</button>') +
+      '<span class="bar"><i style="width:'+q.pct+'%"></i></span>' +
+    '</div>').join("");
+}
+$("#queue").addEventListener("click", e => {
+  const b = e.target.closest("[data-drop]"); if (!b) return;
+  queue.splice(+b.dataset.drop, 1);
+  renderQueue();
+  show("#upBtn", queue.length > 0);
+  $("#upBtn").textContent = "Upload " + queue.length + " file" + (queue.length===1?"":"s");
+});
+
+/* ---------- upload ---------- */
+async function put(params, blob, type){
+  const res = await fetch(api(params), {
+    method:"POST",
+    headers:{ "Content-Type": type, "X-Auth": pw },
+    body: blob
+  });
+  const d = await res.json();
+  if (!d.ok) throw new Error(d.error || "upload failed");
+  return d;
+}
+
+$("#upBtn").addEventListener("click", async () => {
+  $("#upBtn").disabled = true;
+  say($("#photoStatus"), "Uploading…", "busy");
+  let failed = 0;
+
+  for (let i = 0; i < queue.length; i++){
+    const q = queue[i];
+    if (q.done) continue;
+    try {
+      if (q.video){
+        q.pct = 30; renderQueue();
+        const name = stamp(i) + ".mp4";
+        await put({ action:"upload", game:picked.date, name, kind:"photo", video:"1", w:0, h:0 },
+                  q.file, q.file.type);
+      } else {
+        q.pct = 20; renderQueue();
+        const big = await shrink(q.file, MAXW);
+        const sm  = await shrink(q.file, THUMB);
+        const name = stamp(i) + ".jpg";
+        q.pct = 55; renderQueue();
+        await put({ action:"upload", game:picked.date, name, kind:"photo", w:big.w, h:big.h },
+                  big.blob, "image/jpeg");
+        q.pct = 85; renderQueue();
+        await put({ action:"upload", game:picked.date, name, kind:"thumb", w:sm.w, h:sm.h },
+                  sm.blob, "image/jpeg");
+      }
+      q.pct = 100; q.done = true; renderQueue();
+    } catch(err){
+      failed++; q.pct = 0; renderQueue();
+      say($("#photoStatus"), "Problem with one file: " + err.message, "bad");
+    }
+  }
+
+  queue = queue.filter(q => !q.done);
+  renderQueue();
+  show("#upBtn", queue.length > 0);
+  await refreshExisting();
+  await loadCounts();
+  if (!failed) say($("#photoStatus"), "Uploaded. Live straight away.", "good");
+  $("#upBtn").disabled = false;
+});
+
+/* ---------- hero ---------- */
+$("#heroDrop").addEventListener("click", () => $("#heroPicker").click());
+$("#heroPicker").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  say($("#heroStatus"), "Uploading…", "busy");
+  try {
+    const big = await shrink(f, 2400);
+    await put({ action:"upload", kind:"hero", game:"hero", name:"current.jpg", w:big.w, h:big.h },
+              big.blob, "image/jpeg");
+    $("#heroPrev").innerHTML = '<img src="'+api({action:"img",key:"hero/current.jpg"})+'&t='+Date.now()+'" alt="">';
+    say($("#heroStatus"), "Hero updated. Live straight away.", "good");
+  } catch(err){
+    say($("#heroStatus"), "Upload failed: " + err.message, "bad");
   }
 });
 
