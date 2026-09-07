@@ -193,6 +193,7 @@ details.notes summary:hover{color:var(--bone)}
     <p class="note">Photos are shrunk here before uploading. The originals stay on your device.</p>
     <label style="margin-top:22px">Already on this game</label>
     <div class="qgrid" id="existing"></div>
+    <button class="btn ghost" id="clearAll" style="margin-top:16px">Remove all from this game</button>
     <button class="btn ghost" id="photoBack" style="margin-top:16px">Back</button>
     <p class="status" id="photoStatus"></p>
   </div>
@@ -274,7 +275,7 @@ details.notes summary:hover{color:var(--bone)}
 const $ = s => document.querySelector(s);
 const KEY = "ihs-score-pw";
 const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const MAXW = 2000, THUMB = 400, JPEG_Q = 0.85;
+const MAXW = 2200, THUMB = 900, JPEG_Q = 0.88;
 let pw = "", games = [], counts = {}, picked = null, queue = [];
 
 const api = (params) => WORKER_URL + "?" + new URLSearchParams(params).toString();
@@ -442,6 +443,21 @@ $("#existing").addEventListener("click", async e => {
     if (d.ok) await refreshExisting();
     else say($("#photoStatus"), d.error || "Could not remove it.", "bad");
   } catch(e){ say($("#photoStatus"), "Could not reach the server.", "bad"); }
+});
+
+$("#clearAll").addEventListener("click", async () => {
+  if (!confirm("Remove every photo on this game? This cannot be undone.")) return;
+  say($("#photoStatus"), "Removing…", "busy");
+  try {
+    const r = await fetch(api({action:"list", game:picked.date}));
+    const d = await r.json();
+    for (const f of (d.files || [])){
+      await fetch(api({action:"delete", key:f.key}), { method:"POST", headers:{ "X-Auth": pw } });
+    }
+    await refreshExisting();
+    await loadCounts();
+    say($("#photoStatus"), "All removed.", "good");
+  } catch(e){ say($("#photoStatus"), "Could not remove them.", "bad"); }
 });
 
 /* ---------- resize in the browser ---------- */
