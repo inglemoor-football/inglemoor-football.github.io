@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-08T11:39:10-07:00",
+ "updated": "2026-09-08T14:50:42-07:00",
  "windowDays": 180,
  "events": [
   {
@@ -43,6 +43,12 @@
    "allDay": false,
    "title": "Varsity game at Highline",
    "location": "Highline Memorial Stadium, 400 S 156th St, Burien, WA 98148, USA"
+  },
+  {
+   "start": "2026-09-12T10:00:00-07:00",
+   "allDay": false,
+   "title": "C-team Practice",
+   "location": ""
   },
   {
    "start": "2026-09-14T16:00:00-07:00",
@@ -99,9 +105,9 @@
    "location": ""
   },
   {
-   "start": "2026-09-23T16:00:00-07:00",
+   "start": "2026-09-22T18:30:00-07:00",
    "allDay": false,
-   "title": "Team Practice",
+   "title": "Team Dinner",
    "location": ""
   },
   {
@@ -111,15 +117,15 @@
    "location": "Mercer Island High School, 9100 SE 42nd St, Mercer Island, WA 98040, USA"
   },
   {
-   "start": "2026-09-24T16:00:00-07:00",
+   "start": "2026-09-23T16:00:00-07:00",
    "allDay": false,
    "title": "Team Practice",
    "location": ""
   },
   {
-   "start": "2026-09-24T18:30:00-07:00",
+   "start": "2026-09-24T16:00:00-07:00",
    "allDay": false,
-   "title": "Team Dinner",
+   "title": "Team Practice",
    "location": ""
   },
   {
@@ -133,6 +139,12 @@
    "allDay": false,
    "title": "Varsity game at Interlake",
    "location": "Interlake High School Stadium, Bellevue, WA 98008, USA"
+  },
+  {
+   "start": "2026-09-26T10:00:00-07:00",
+   "allDay": false,
+   "title": "C-team Practice",
+   "location": ""
   },
   {
    "start": "2026-09-28T16:00:00-07:00",
@@ -183,6 +195,12 @@
    "location": "Pop Keeney Stadium, 9809 NE 188th St, Bothell, WA 98011, USA"
   },
   {
+   "start": "2026-10-03T10:00:00-07:00",
+   "allDay": false,
+   "title": "C-team Practice",
+   "location": ""
+  },
+  {
    "start": "2026-10-05T16:00:00-07:00",
    "allDay": false,
    "title": "Team Practice",
@@ -229,6 +247,12 @@
    "allDay": false,
    "title": "Varsity game at Redmond",
    "location": "Redmond High School, 17272 NE 104th St, Redmond, WA 98052, USA"
+  },
+  {
+   "start": "2026-10-10T10:00:00-07:00",
+   "allDay": false,
+   "title": "C-team practice",
+   "location": ""
   },
   {
    "start": "2026-10-12T16:00:00-07:00",
@@ -279,6 +303,12 @@
    "location": "Lake Washington High School, 12033 NE 80th St, Kirkland, WA 98033, USA"
   },
   {
+   "start": "2026-10-17T10:00:00-07:00",
+   "allDay": false,
+   "title": "C-team Practice",
+   "location": ""
+  },
+  {
    "start": "2026-10-19T16:00:00-07:00",
    "allDay": false,
    "title": "Team Practice",
@@ -318,6 +348,12 @@
    "start": "2026-10-23T16:00:00-07:00",
    "allDay": false,
    "title": "Team Practice",
+   "location": ""
+  },
+  {
+   "start": "2026-10-24T10:00:00-07:00",
+   "allDay": false,
+   "title": "All team practice",
    "location": ""
   },
   {
