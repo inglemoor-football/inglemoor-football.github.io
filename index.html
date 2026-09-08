@@ -474,6 +474,11 @@ nav a.navgold.active{color:#FFC754}
 .hero .wrap{position:relative}
 .herogrid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
 .hcol-b{display:flex;flex-direction:column;justify-content:center;gap:0}
+.herorec{display:flex;align-items:baseline;gap:12px;margin-bottom:22px}
+.herorec .hrn{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;
+  color:var(--gold)}
+.herorec .hrl{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--mute)}
 .hcol-b .gamefacts{flex-direction:column;gap:7px;align-items:flex-start;
   padding-left:20px;border-left:2px solid var(--gold);margin-bottom:30px}
 /* the action shot, once there is one, runs full width beneath both columns */
@@ -829,6 +834,11 @@ nav a.navgold.active{color:#FFC754}
   line-height:1.05;text-transform:uppercase;color:var(--bone)}
 .commit figcaption span{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
   letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-top:2px}
+@media(max-width:700px){
+  #commitMount .row{display:block}
+  .commit figcaption{padding:34px 15px 13px}
+  .commit figcaption b{font-size:22px}
+}
 .commit figcaption em{display:block;font-style:normal;font-family:var(--cond);font-weight:700;
   font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold);margin-top:3px}
 .cmlink{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.15em;
@@ -1136,6 +1146,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <h1 class="matchup" id="heroMatchup"></h1>
       </div>
       <div class="hcol hcol-b">
+        <div class="herorec" id="heroRec"></div>
         <p class="gamefacts" id="heroFacts"></p>
         <div class="clock" id="clock" aria-label="Time until kickoff"></div>
         <div class="cta" id="heroCta"></div>
@@ -1378,6 +1389,11 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '<span class="us">Inglemoor</span>' +
       '<span class="vs">' + (next.home ? "hosts" : "travels to") + '</span>' +
       '<span class="them">' + next.opp + '</span>';
+
+    $("#heroRec").innerHTML = done.length
+      ? '<span class="hrn">' + W + '–' + L + '</span><span class="hrl">This season</span>'
+      : '<span class="hrl">Season opens ' +
+        (games[0] ? MON[games[0].when.getMonth()] + " " + games[0].when.getDate() : "soon") + '</span>';
 
     $("#heroFacts").innerHTML =
       '<span>' + fmtDate(next.when) + '</span>' +
@@ -1989,8 +2005,34 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     function layout(){
       const W = m.clientWidth || 900;
-      const gap = 12, target = W < 640 ? 210 : 240;
+      const gap = 12, target = 240;
       m.innerHTML = "";
+
+      // On a phone these get too small for the caption to sit over them,
+      // so give each poster the full width and stack.
+      if (W < 700){
+        shots.forEach((c,i) => {
+          c.i = i;
+          const div = document.createElement("div");
+          div.className = "row";
+          const fig = document.createElement("figure");
+          fig.className = "commit";
+          fig.style.width = W + "px";
+          fig.style.height = Math.round(W / c.r) + "px";
+          fig.dataset.i = i;
+          fig.innerHTML =
+            '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
+            '<span class="cmyear">'+c.year+'</span>' +
+            (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') +
+            '<figcaption><b>'+c.name+'</b>' +
+              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+              (c.note ? '<em>'+c.note+'</em>' : '') +
+            '</figcaption>';
+          div.appendChild(fig);
+          m.appendChild(div);
+        });
+        return;
+      }
 
       // group into rows at a constant target height — no rhythm, because
       // varying the height is what made older posters look more important
