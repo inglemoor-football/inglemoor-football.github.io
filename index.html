@@ -474,11 +474,23 @@ nav a.navgold.active{color:#FFC754}
 .hero .wrap{position:relative}
 .herogrid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
 .hcol-b{display:flex;flex-direction:column;justify-content:center;gap:0}
-.herorec{display:flex;align-items:baseline;gap:12px;margin-bottom:22px}
-.herorec .hrn{font-family:var(--display);font-weight:800;font-size:44px;line-height:1;
-  color:var(--gold)}
-.herorec .hrl{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.19em;
-  text-transform:uppercase;color:var(--mute)}
+.herostats{display:grid;grid-template-columns:repeat(2,max-content);margin-top:28px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.herostats div{padding:16px 30px 16px 0}
+.herostats div + div{border-left:1px solid var(--line);padding-left:30px}
+.herostats .k{display:block;font-family:var(--cond);font-weight:600;font-size:11px;
+  letter-spacing:.19em;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
+.herostats .v{display:block;font-family:var(--display);font-weight:800;font-size:32px;line-height:1}
+.herostats .v.g{color:var(--gold)}
+.herostats .v.w{color:var(--win)}
+.herostats .v.l{color:var(--loss)}
+.herostats small{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-top:5px}
+@media(max-width:560px){
+  .herostats div{padding-right:22px}
+  .herostats div + div{padding-left:22px}
+  .herostats .v{font-size:27px}
+}
 .hcol-b .gamefacts{flex-direction:column;gap:7px;align-items:flex-start;
   padding-left:20px;border-left:2px solid var(--gold);margin-bottom:30px}
 /* the action shot, once there is one, runs full width beneath both columns */
@@ -1144,9 +1156,9 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <div class="hcol">
         <p class="week" id="heroWeek"></p>
         <h1 class="matchup" id="heroMatchup"></h1>
+        <div class="herostats" id="heroRec"></div>
       </div>
       <div class="hcol hcol-b">
-        <div class="herorec" id="heroRec"></div>
         <p class="gamefacts" id="heroFacts"></p>
         <div class="clock" id="clock" aria-label="Time until kickoff"></div>
         <div class="cta" id="heroCta"></div>
@@ -1390,10 +1402,29 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '<span class="vs">' + (next.home ? "hosts" : "travels to") + '</span>' +
       '<span class="them">' + next.opp + '</span>';
 
-    $("#heroRec").innerHTML = done.length
-      ? '<span class="hrn">' + W + '–' + L + '</span><span class="hrl">This season</span>'
-      : '<span class="hrl">Season opens ' +
-        (games[0] ? MON[games[0].when.getMonth()] + " " + games[0].when.getDate() : "soon") + '</span>';
+    (function(){
+      const cells = [];
+      cells.push(
+        '<div><span class="k">Record</span>' +
+        '<span class="v g">' + (done.length ? W + "–" + L : "0–0") + '</span>' +
+        '<small>' + SITE.team.league + '</small></div>');
+
+      const lastGame = done[done.length-1];
+      if (lastGame){
+        cells.push(
+          '<div><span class="k">Last out</span>' +
+          '<span class="v ' + (lastGame.won ? "w" : "l") + '">' +
+            (lastGame.won ? "W " : "L ") + lastGame.us + "–" + lastGame.them + '</span>' +
+          '<small>' + (lastGame.home ? "vs " : "at ") + lastGame.opp + ' · ' +
+            MON[lastGame.when.getMonth()] + ' ' + lastGame.when.getDate() + '</small></div>');
+      } else if (games[0]) {
+        cells.push(
+          '<div><span class="k">Season opens</span>' +
+          '<span class="v">' + MON[games[0].when.getMonth()] + ' ' + games[0].when.getDate() + '</span>' +
+          '<small>' + (games[0].home ? "vs " : "at ") + games[0].opp + '</small></div>');
+      }
+      $("#heroRec").innerHTML = cells.join("");
+    })();
 
     $("#heroFacts").innerHTML =
       '<span>' + fmtDate(next.when) + '</span>' +
