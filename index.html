@@ -52,8 +52,8 @@ const SITE = {
     show: true,
     feed: "data/events.json",
     defaultView: "schedule",   // "schedule" or "month"
-    visibleDays: 7,            // roughly how many days are visible before scrolling
-    note: "Everything the team calendar holds — practices, dinners, and every game."
+    visibleDays: 5,            // days visible before scrolling; the last one is half-cut on purpose
+    note: "Everything on the team calendar: practices, dinners, games, and more."
   },
 
   /* ---- PHOTOS ----------------------------------------------
@@ -202,7 +202,7 @@ const SITE = {
      "photo" is a headshot filename. Drop images into
      images/coaches/ and set e.g.
      photo:"images/coaches/eubanks.jpg". Left empty, the card shows
-     the coach's initials instead — that is by design, not a
+     the coach's initials instead — that's by design, not a
      broken image.
      --------------------------------------------------------- */
   coaches: [
@@ -239,6 +239,19 @@ const SITE = {
     { team:"C Team", first:"Jacob", last:"Swenson", photo:"images/coaches/jacob-swenson.jpg",
       role:"C Team Assistant Coach",
       bio:"Coach Jacob is entering his fourth year coaching at the high school level and his second with the Inglemoor program. A former Viking himself from 2005 to 2008, he understands the pride that comes with being part of the Inglemoor football family, and his return has been made more meaningful by having his son Maleik now playing in the program. He coaches the C Team, working with running backs, cornerbacks and special teams, with a focus on fundamentals, discipline, teamwork and player development. Coach Jacob is proud to help develop the next generation of Vikings, on and off the field." }
+  ],
+
+  /* ---- COMMITTED ATHLETES -------------------------------
+     Grouped by class, newest first. Drop headshots into
+     images/committed/ and point "photo" at them. Leave photo
+     empty and the card shows initials instead.
+     --------------------------------------------------------- */
+  committed: [
+    { year:2025, name:"Brandon Henkens", college:"University of Puget Sound",      position:"DL",    art:"images/committed/henkens.jpg" },
+    { year:2024, name:"Will Frank",      college:"Pacific Lutheran University",    position:"QB/CB", art:"images/committed/frank.jpg" },
+    { year:2024, name:"Matteus Senna",   college:"University of Montana Western",  position:"WR/S",  art:"images/committed/senna.jpg" },
+    { year:2020, name:"Trevor Thurman",  college:"Eastern Washington University",  position:"DE",    art:"images/committed/thurman.jpg" },
+    { year:2019, name:"Quentin Moore",   college:"University of Washington",       position:"TE",    art:"images/committed/moore.jpg" }
   ],
 
   /* ---- SPONSORS -------------------------------------------
@@ -285,12 +298,12 @@ const SITE = {
      --------------------------------------------------------- */
   support: [
     { t:"Pay booster dues",
-      d:"Separate from the school's athletic fee. Dues are what actually fund the program — film, meals, gear and travel. Paying in the spring spreads the cost out before the school's fee comes due in the fall.",
+      d:"Separate from the school's athletic fee. Dues fund the things that make the program run: film, team meals, equipment, and travel. Paying in the spring helps spread out the cost before the school's athletic fee comes due in the fall.",
       url:"https://www.zeffy.com/en-US/ticketing/2026-booster-dues-2",
       cta:"Pay dues" },
 
     { t:"Donate to the boosters",
-      d:"Any amount, any time. We are a registered 501(c)(3), so your gift is tax-deductible. Ask your employer about matching — a lot of local companies do it and most people never think to check.",
+      d:"Any amount, any time. We're a registered 501(c)(3), so your gift is tax-deductible. Ask your employer about matching — a lot of local companies do it and most people never think to check.",
       url:"https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055",
       cta:"Donate" },
 
@@ -306,7 +319,7 @@ const SITE = {
   volunteer: {
     show: true,
     lede: "Viking football runs on parents. Chains and downs, the concession stand, team dinners, filming, and setting up before kickoff — none of it happens without people signing up.",
-    body: "You do not need to know football, and you do not need to commit to a season. Take one shift, see how it goes. Most people end up taking another. It is also the fastest way to meet the other families and to actually see your player's season up close.",
+    body: "You don't need to know football, and you don't need to commit to a season. Take one shift, see how it goes. Most people end up signing up again. It's also the fastest way to meet the other families and to actually see your player's season up close.",
     url: "https://www.signupgenius.com/go/70A0D49AFA628AAF94-62398519-season#/",
     cta: "See open shifts"
   },
@@ -316,16 +329,17 @@ const SITE = {
     address: "PO Box 821064, Kenmore, WA 98028",
     status: "Registered 501(c)(3) nonprofit",
     mission: "The Inglemoor High School Viking Gridiron Club is the official booster club for the IHS football program. We are a group of parents who exist to positively support, promote and enhance the experience of Viking football, its student-athletes, coaches and families.",
-    detail: "We do that by including every football family as a member, strengthening ties with the student body, administration and faculty, working alongside the junior football league to build the future of IHS football, and forming financial and service partnerships in the community — through fundraising, sponsorships, donations, and volunteering our time.",
+    detail: "Every football family is automatically part of the booster club. We support the program by building connections with students, families, staff, and the community. We also partner with the junior football program to help build the future of Viking football and raise the funds that keep the program running.",
     board: [
       { role:"President",                            name:"Tara Eubanks",              year:"2029" },
       { role:"VP, Fundraising & Sponsorship",        name:"Amanda Rainwater",          year:"2027" },
       { role:"Secretary",                            name:"Pam Estevez",               year:"2027" },
       { role:"Treasurer",                            name:"Lori Larsen",               year:"2029" },
-      { role:"Social Media & Communications",        name:"Hedi Cowan",                year:"2027 & 2029" },
+      { role:"Social Media & Communications",        name:"Heidi Cowan",               year:"2027 & 2029" },
       { role:"Volunteer Coordinator",                name:"Shelly Holt",               year:"2027" },
       { role:"Spiritwear & Website",                 name:"Graham & Chrystal Comley",  year:"2029" },
-      { role:"Team Meals",                           name:"Tori Neiborsky",            year:"2027" }
+      { role:"Team Meals",                           name:"Tori Nieborsky",            year:"2027" },
+      { role:"Field Operations",                     name:"Karen Clements",            year:"" }
     ],
 
     // The call for new board members. Set show:false to hide it.
@@ -335,13 +349,6 @@ const SITE = {
       body: "Several positions open up next year and we would welcome new volunteers. No experience needed — just a willingness to help.",
       cta: "Email the boosters"
     }
-  },
-
-  registration: {
-    opens: "Registration opens May 1 and runs through FinalForms. You will also need an ASB sticker and the $200 athletic fee, both handled by the school. Your details carry over year to year, so it is quick after the first time.",
-    ctaHeading: "New to the program?",
-    ctaBody: "Start with FinalForms — create a parent account, add your student, and pick football. Everything else follows from there.",
-    ctaLabel: "Athletics registration"
   },
 
   contact: {
@@ -795,6 +802,27 @@ nav a.navgold:hover{color:#FFC754}
 .plbclose:hover{border-color:var(--gold);color:var(--gold)}
 @media(max-width:640px){.plbnav{width:38px;height:38px;font-size:18px}}
 
+/* ---------- committed athletes ---------- */
+.commyear{margin-bottom:38px}
+.commyear:last-child{margin-bottom:0}
+.commgrid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+.commit{margin:0;background:var(--panel);border:1px solid var(--line);
+  border-top:2px solid var(--line2);transition:.2s;cursor:pointer;overflow:hidden}
+.commit:hover{border-top-color:var(--gold);background:var(--panel2)}
+/* the graphics are a mix of landscape and portrait, so contain rather
+   than crop — the athlete's name is often printed in the artwork */
+.cmart{background:var(--ink);aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden}
+.cmart img{width:100%;height:100%;object-fit:contain;display:block}
+.commit figcaption{padding:16px 18px 18px}
+.commit h4{font-family:var(--display);font-weight:800;font-size:23px;line-height:1.05;
+  text-transform:uppercase;margin:0 0 4px}
+.cmcol{font-family:var(--body);font-size:14.5px;color:var(--mute);margin:0;line-height:1.35}
+.cmpos{display:inline-block;margin-top:9px;font-family:var(--cond);font-weight:700;
+  font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);
+  border:1px solid var(--gold-deep);padding:3px 9px}
+.commit.noart figcaption{padding:22px}
+@media(max-width:560px){.commgrid{grid-template-columns:1fr}}
+
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
   border-top:2px solid var(--line2);margin-bottom:10px}
@@ -1069,16 +1097,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav">
-      <a href="#schedule">Schedule</a>
-      <a href="#calendar">Events</a>
       <a href="#donate" class="navgold">Donate</a>
       <a href="#volunteer">Volunteer</a>
-      <a href="#coaches">Coaches</a>
+      <a href="#schedule">Schedule</a>
       <a href="#team">Team</a>
+      <a href="#calendar">Events</a>
+      <a href="#coaches">Coaches</a>
       <a href="#photos">Photos</a>
       <a href="#boosters">Boosters</a>
-      <a href="#play">Play</a>
       <a href="#archive">History</a>
+      <a href="#committed">Committed</a>
       <a href="#sponsors">Sponsors</a>
       <span class="social" id="social"></span>
     </nav>
@@ -1100,38 +1128,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <div class="cta" id="heroCta"></div>
       </div>
       <div class="heroshot" id="heroShot"></div>
-    </div>
-  </section>
-
-  <!-- SCHEDULE TABLE -->
-  <section id="schedule">
-    <div class="wrap">
-      <div class="schedhead">
-        <div>
-          <p class="eyebrow">Full schedule</p>
-          <h2 class="sec">Dates &amp; results</h2>
-          <p class="lede">All kickoffs 7:00 PM. Home games at Pop Keeney Stadium in Bothell.</p>
-        </div>
-        <div class="recbox">
-          <span class="rn" id="recBig"></span>
-          <span class="rl">This season</span>
-        </div>
-      </div>
-      <table class="sched">
-        <thead><tr><th>Date</th><th>Opponent</th><th>Result</th><th></th></tr></thead>
-        <tbody id="schedBody"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- TEAM CALENDAR -->
-  <section id="calendar">
-    <div class="wrap">
-      <p class="eyebrow">Team calendar</p>
-      <h2 class="sec">Upcoming events</h2>
-      <p class="lede" id="calLede"></p>
-      <div class="calbar" id="calBar"></div>
-      <div id="calMount"></div>
     </div>
   </section>
 
@@ -1160,13 +1156,24 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </div>
   </section>
 
-  <!-- COACHES -->
-  <section id="coaches">
+  <!-- SCHEDULE TABLE -->
+  <section id="schedule">
     <div class="wrap">
-      <p class="eyebrow">Staff</p>
-      <h2 class="sec">Coaches</h2>
-      <p class="lede">The people running practice, calling plays and keeping players healthy.</p>
-      <div class="rv" id="coachGrid"></div>
+      <div class="schedhead">
+        <div>
+          <p class="eyebrow">Full schedule</p>
+          <h2 class="sec">Dates &amp; results</h2>
+          <p class="lede">All kickoffs 7:00 PM. Home games are played at Pop Keeney Stadium in Bothell.</p>
+        </div>
+        <div class="recbox">
+          <span class="rn" id="recBig"></span>
+          <span class="rl">This season</span>
+        </div>
+      </div>
+      <table class="sched">
+        <thead><tr><th>Date</th><th>Opponent</th><th>Result</th><th></th></tr></thead>
+        <tbody id="schedBody"></tbody>
+      </table>
     </div>
   </section>
 
@@ -1177,6 +1184,27 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <h2 class="sec">2026 team photo</h2>
       <p class="lede">Varsity, JV, and the coaching staff. One frame, one program.</p>
       <div id="teamMount"></div>
+    </div>
+  </section>
+
+  <!-- TEAM CALENDAR -->
+  <section id="calendar">
+    <div class="wrap">
+      <p class="eyebrow">Team calendar</p>
+      <h2 class="sec">Upcoming events</h2>
+      <p class="lede" id="calLede"></p>
+      <div class="calbar" id="calBar"></div>
+      <div id="calMount"></div>
+    </div>
+  </section>
+
+  <!-- COACHES -->
+  <section id="coaches">
+    <div class="wrap">
+      <p class="eyebrow">Staff</p>
+      <h2 class="sec">Coaches</h2>
+      <p class="lede">The people running practice, calling plays and keeping players healthy.</p>
+      <div class="rv" id="coachGrid"></div>
     </div>
   </section>
 
@@ -1209,20 +1237,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </div>
   </section>
 
-  <!-- PLAY -->
-  <section id="play">
-    <div class="wrap">
-      <div class="two spontop">
-        <div>
-          <p class="eyebrow">Turning out</p>
-          <h2 class="sec">Play for the Vikings</h2>
-          <p class="lede" id="regOpens" style="margin-bottom:0"></p>
-        </div>
-        <div id="playCta"></div>
-      </div>
-    </div>
-  </section>
-
   <!-- PAST SEASONS -->
   <section id="archive">
     <div class="wrap">
@@ -1230,6 +1244,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       <h2 class="sec">Past seasons</h2>
       <p class="lede">Click a season to open the full results.</p>
       <div id="archiveMount"></div>
+    </div>
+  </section>
+
+  <!-- COMMITTED -->
+  <section id="committed">
+    <div class="wrap">
+      <p class="eyebrow">Next level</p>
+      <h2 class="sec">Committed</h2>
+      <p class="lede">Vikings who went on to play college football.</p>
+      <div id="commitMount"></div>
     </div>
   </section>
 
@@ -1520,12 +1544,15 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
       // size the box to about visibleDays worth of rows, then let it scroll
       const box = $("#calScroll");
-      const want = cal.visibleDays || 7;
+      const want = cal.visibleDays || 5;
       const cards = box.querySelectorAll(".calday");
       if (cards.length > want){
+        // full height for the first four, then half of the fifth so it is
+        // visibly cut off — an obvious signal there is more below
         let h = 0;
-        for (let i = 0; i < want; i++) h += cards[i].offsetHeight + 14;
-        box.style.maxHeight = Math.round(h - 7) + "px";
+        for (let i = 0; i < want-1; i++) h += cards[i].offsetHeight + 14;
+        h += Math.round(cards[want-1].offsetHeight * 0.5);
+        box.style.maxHeight = Math.round(h) + "px";
         box.classList.add("scrolls");
       }
     }
@@ -1699,183 +1726,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     });
   })();
 
-  /* ---- PLAY ---- */
-  (function(){
-    const r = SITE.registration;
-    $("#regOpens").textContent = r.opens;
-    $("#playCta").innerHTML = '<div class="join">' +
-      '<h3>' + (r.ctaHeading || "Ready to sign up?") + '</h3>' +
-      '<p>' + (r.ctaBody || "") + '</p>' +
-      '<a class="btn" href="' + (SITE.links.register || "#") + '" target="_blank" rel="noopener">' +
-        (r.ctaLabel || "Athletics registration") + '</a>' +
-    '</div>';
-  })();
-
-  /* ---- PHOTOS ---- */
-  (async function(){
-    const cfg = SITE.photos;
-    if (!cfg || !cfg.show || !cfg.worker){ const n=$("#photos"); if(n) n.remove(); return; }
-    const api = p => cfg.worker + "?" + new URLSearchParams(p).toString();
-
-    let counts = {};
-    try {
-      const r = await fetch(api({action:"counts"}));
-      const d = await r.json();
-      if (d.ok) counts = d.counts || {};
-      if (d.ok && d.hero && !SITE.heroImage){
-        const shot = $("#heroShot");
-        if (shot) shot.innerHTML = '<img src="'+api({action:"img",key:"hero/current.jpg"})+'" ' +
-          'alt="Inglemoor Viking football" onerror="this.parentNode.remove()">';
-      }
-    } catch(e){}
-
-    // only games that actually have photos
-    const withPhotos = games.filter(g => !g.tbd && counts[g.date] > 0);
-    if (!withPhotos.length){
-      $("#phGrid").innerHTML = '<div class="empty"><h4>Photos coming soon</h4>' +
-        '<p>Game photos will appear here through the season.</p></div>';
-      return;
-    }
-    withPhotos.reverse();                      // newest game first
-
-    $("#phLede").textContent = "Game by game, through the season.";
-    $("#phPills").innerHTML = withPhotos.map((g,i) =>
-      '<button class="pill" aria-pressed="'+(i===0)+'" data-i="'+i+'">' +
-        '<span class="p1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
-        '<span class="p2">' + MON[g.when.getMonth()] + ' ' + g.when.getDate() +
-          ' · ' + counts[g.date] + '</span>' +
-      '</button>').join("");
-
-    let shots = [], active = 0;
-
-    function layout(){
-      const wrap = $("#phGrid");
-      const W = wrap.clientWidth || 900;
-      const gap = 6, base = W < 640 ? 170 : 250;
-      // Rows alternate between taller and shorter, which changes how many
-      // photos fit on each one. Without this a set of identically shaped
-      // photos lays out as a plain equal grid.
-      const rhythm = W < 640 ? [1, 0.8] : [1, 0.8, 1.2];
-      let rowNo = 0;
-      const targetFor = n => base * rhythm[n % rhythm.length];
-      wrap.innerHTML = "";
-      let row = [], sum = 0, target = targetFor(0);
-      const flush = last => {
-        if (!row.length) return;
-        const avail = W - gap*(row.length-1);
-        let h = avail / sum;
-        if (last && h > target*1.45) h = target;
-        const div = document.createElement("div");
-        div.className = "row";
-        row.forEach(s => {
-          const t = document.createElement("div");
-          t.className = "tile" + (s.video ? " vid" : "");
-          t.style.width = Math.floor(h*s.r) + "px";
-          t.style.height = Math.floor(h) + "px";
-          t.dataset.i = s.i;
-          t.innerHTML = s.video
-            ? '<span class="ph">Video</span>'
-            : '<img src="'+api({action:"img",key:s.thumb})+'" alt="" loading="lazy">';
-          div.appendChild(t);
-        });
-        wrap.appendChild(div);
-        row = []; sum = 0;
-      };
-      const plan = [];
-      shots.forEach((s,i) => {
-        s.i = i; row.push(s); sum += s.r;
-        if (sum*target >= W){ plan.push(row); row = []; sum = 0; rowNo++; target = targetFor(rowNo); }
-      });
-      if (row.length) plan.push(row);
-      // a lone photo on the last row looks like a mistake — borrow one back
-      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
-        plan[plan.length-1].unshift(plan[plan.length-2].pop());
-      }
-      rowNo = 0;
-      plan.forEach((r,i) => {
-        row = r; sum = r.reduce((t,x) => t + x.r, 0);
-        target = targetFor(i);
-        flush(i === plan.length-1);
-      });
-    }
-
-    async function pick(k){
-      active = k;
-      $("#phPills").querySelectorAll(".pill").forEach((p,i) => p.setAttribute("aria-pressed", i===k));
-      $("#phGrid").innerHTML = '<p class="credit">Loading…</p>';
-      try {
-        const r = await fetch(api({action:"list", game: withPhotos[k].date}));
-        const d = await r.json();
-        shots = (d.files||[]).map(f => ({
-          key:f.key, thumb:f.thumb, video:f.video,
-          r: (f.w && f.h) ? (f.w/f.h) : 1.5
-        }));
-      } catch(e){ shots = []; }
-      layout();
-    }
-
-    $("#phPills").addEventListener("click", e => {
-      const b = e.target.closest(".pill"); if (!b) return;
-      pick(+b.dataset.i);
-    });
-    addEventListener("resize", () => { if (shots.length) layout(); });
-
-    /* lightbox, reusing the coach one's shape */
-    const lb = document.createElement("div");
-    lb.className = "plb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true");
-    lb.innerHTML = '<div class="plbstage">' +
-        '<button class="plbnav prev" aria-label="Previous">&larr;</button>' +
-        '<div class="plbbox" id="plbBox"></div>' +
-        '<button class="plbnav next" aria-label="Next">&rarr;</button>' +
-      '</div>' +
-      '<div class="plbfoot"><span id="plbMeta"></span>' +
-        '<button class="plbclose">Close</button></div>';
-    document.body.appendChild(lb);
-
-    let at = 0;
-    function open(i){
-      at = (i + shots.length) % shots.length;
-      const s = shots[at];
-      lb.querySelector("#plbBox").innerHTML = s.video
-        ? '<video src="'+api({action:"img",key:s.key})+'" controls autoplay playsinline></video>'
-        : '<img src="'+api({action:"img",key:s.key})+'" alt="">';
-      lb.querySelector("#plbMeta").textContent =
-        (withPhotos[active].home?"vs ":"at ") + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
-      lb.classList.add("on");
-    }
-    const close = () => { lb.classList.remove("on"); lb.querySelector("#plbBox").innerHTML = ""; };
-
-    $("#phGrid").addEventListener("click", e => {
-      const t = e.target.closest(".tile"); if (!t) return;
-      open(+t.dataset.i);
-    });
-    lb.addEventListener("click", e => {
-      if (e.target === lb || e.target.closest(".plbclose")) return close();
-      if (e.target.closest(".prev")) return open(at-1);
-      if (e.target.closest(".next")) return open(at+1);
-    });
-    document.addEventListener("keydown", e => {
-      if (!lb.classList.contains("on")) return;
-      if (e.key === "Escape") close();
-      if (e.key === "ArrowLeft") open(at-1);
-      if (e.key === "ArrowRight") open(at+1);
-    });
-
-    // a Photos link on each played game in the schedule
-    document.querySelectorAll("#schedBody tr").forEach((tr,i) => {
-      const g = games[i]; if (!g || !counts[g.date]) return;
-      const cell = tr.lastElementChild; if (!cell) return;
-      const k = withPhotos.findIndex(x => x.date === g.date); if (k < 0) return;
-      cell.innerHTML = '<a class="photolink" href="#photos" data-jump="'+k+'">Photos · ' + counts[g.date] + '</a>';
-    });
-    document.addEventListener("click", e => {
-      const a = e.target.closest("[data-jump]"); if (!a) return;
-      pick(+a.dataset.jump);
-    });
-
-    pick(0);
-  })();
-
   /* ---- BOOSTERS ---- */
   $("#bMission").textContent = SITE.boosters.mission;
   $("#bDetail").textContent  = SITE.boosters.detail;
@@ -1942,11 +1792,62 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   $("#sponsorCta").innerHTML = SITE.contact.email
     ? '<div class="join">' +
         '<h3>Become a sponsor</h3>' +
-        '<p>Three tiers, and your logo runs here all season. Get in touch and we will send the details.</p>' +
+        '<p>Three tiers, and your logo runs here all season. Get in touch and we\'ll send the details.</p>' +
         '<a class="btn" href="mailto:'+SITE.contact.email+'?subject=Sponsoring%20Inglemoor%20football">Email the boosters</a>' +
         '<p class="jmail">'+SITE.contact.email+'</p>' +
       '</div>'
     : '';
+
+  /* ---- COMMITTED ---- */
+  (function(){
+    const list = SITE.committed || [];
+    const m = $("#commitMount");
+    if (!list.length){
+      m.innerHTML = '<div class="empty"><h4>Coming soon</h4>' +
+        '<p>Vikings who signed to play college football will be listed here, grouped by class.</p></div>';
+      return;
+    }
+    const years = [...new Set(list.map(c => c.year))].sort((a,b) => b - a);
+    m.innerHTML = years.map((y,yi) =>
+      '<div class="commyear">' +
+        '<h3 class="subhead' + (yi === 0 ? " first" : "") + '">Class of ' + y + '</h3>' +
+        '<div class="commgrid">' + list.filter(c => c.year === y).map((c,i) =>
+          '<figure class="commit' + (c.art ? "" : " noart") + '" data-c="'+y+'-'+i+'">' +
+            (c.art
+              ? '<div class="cmart"><img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy"></div>'
+              : '') +
+            '<figcaption>' +
+              '<h4>'+c.name+'</h4>' +
+              '<p class="cmcol">'+c.college+'</p>' +
+              (c.position ? '<span class="cmpos">'+c.position+'</span>' : '') +
+            '</figcaption>' +
+          '</figure>').join("") +
+        '</div>' +
+      '</div>').join("");
+
+    /* tap the artwork to see it full size */
+    const lb = document.createElement("div");
+    lb.className = "plb";
+    lb.innerHTML = '<div class="plbstage"><div class="plbbox" id="cmBox"></div></div>' +
+      '<div class="plbfoot"><span id="cmMeta"></span><button class="plbclose">Close</button></div>';
+    document.body.appendChild(lb);
+    const close = () => { lb.classList.remove("on"); lb.querySelector("#cmBox").innerHTML = ""; };
+
+    m.addEventListener("click", e => {
+      const f = e.target.closest(".commit"); if (!f || !f.querySelector("img")) return;
+      const [y,i] = f.dataset.c.split("-");
+      const c = list.filter(x => x.year == y)[+i];
+      lb.querySelector("#cmBox").innerHTML = '<img src="'+c.art+'" alt="'+c.name+'">';
+      lb.querySelector("#cmMeta").textContent = c.name + " · " + c.college;
+      lb.classList.add("on");
+    });
+    lb.addEventListener("click", e => {
+      if (e.target === lb || e.target.closest(".plbclose")) close();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && lb.classList.contains("on")) close();
+    });
+  })();
 
   /* ---- SPONSORS ---- */
   (function(){
