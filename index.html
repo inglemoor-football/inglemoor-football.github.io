@@ -439,6 +439,9 @@ nav a{
 nav a:hover{color:var(--bone)}
 nav a.navgold{color:var(--gold)}
 nav a.navgold:hover{color:#FFC754}
+/* whichever section you are looking at */
+nav a.active{color:var(--bone)}
+nav a.navgold.active{color:#FFC754}
 .social{display:flex;gap:12px;align-items:center;margin-left:4px}
 .social a{color:var(--mute);display:grid;place-items:center;transition:color .18s}
 .social a:hover{color:var(--gold)}
@@ -803,25 +806,20 @@ nav a.navgold:hover{color:#FFC754}
 @media(max-width:640px){.plbnav{width:38px;height:38px;font-size:18px}}
 
 /* ---------- committed athletes ---------- */
-.commyear{margin-bottom:38px}
-.commyear:last-child{margin-bottom:0}
-.commgrid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
-.commit{margin:0;background:var(--panel);border:1px solid var(--line);
-  border-top:2px solid var(--line2);transition:.2s;cursor:pointer;overflow:hidden}
-.commit:hover{border-top-color:var(--gold);background:var(--panel2)}
-/* the graphics are a mix of landscape and portrait, so contain rather
-   than crop — the athlete's name is often printed in the artwork */
-.cmart{background:var(--ink);aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden}
-.cmart img{width:100%;height:100%;object-fit:contain;display:block}
-.commit figcaption{padding:16px 18px 18px}
-.commit h4{font-family:var(--display);font-weight:800;font-size:23px;line-height:1.05;
-  text-transform:uppercase;margin:0 0 4px}
-.cmcol{font-family:var(--body);font-size:14.5px;color:var(--mute);margin:0;line-height:1.35}
-.cmpos{display:inline-block;margin-top:9px;font-family:var(--cond);font-weight:700;
-  font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);
-  border:1px solid var(--gold-deep);padding:3px 9px}
-.commit.noart figcaption{padding:22px}
-@media(max-width:560px){.commgrid{grid-template-columns:1fr}}
+#commitMount{display:flex;flex-direction:column;gap:10px}
+#commitMount .row{display:flex;gap:10px}
+.commit{position:relative;margin:0;overflow:hidden;cursor:pointer;background:var(--panel2);
+  border:1px solid transparent;transition:border-color .15s}
+.commit:hover{border-color:var(--gold)}
+.commit img{width:100%;height:100%;object-fit:cover;display:block}
+.cmyear{position:absolute;top:0;left:0;font-family:var(--cond);font-weight:700;
+  font-size:12px;letter-spacing:.16em;background:var(--gold);color:var(--ink);padding:5px 11px}
+.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 10px;
+  background:linear-gradient(180deg,transparent,rgba(10,11,13,.92) 55%)}
+.commit figcaption b{display:block;font-family:var(--display);font-weight:800;font-size:19px;
+  line-height:1.05;text-transform:uppercase;color:var(--bone)}
+.commit figcaption span{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-top:2px}
 
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
@@ -1798,34 +1796,246 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '</div>'
     : '';
 
+  /* ---- PHOTOS ---- */
+  (async function(){
+    const cfg = SITE.photos;
+    if (!cfg || !cfg.show || !cfg.worker){ const n=$("#photos"); if(n) n.remove(); return; }
+    const api = p => cfg.worker + "?" + new URLSearchParams(p).toString();
+
+    let counts = {};
+    try {
+      const r = await fetch(api({action:"counts"}));
+      const d = await r.json();
+      if (d.ok) counts = d.counts || {};
+      if (d.ok && d.hero && !SITE.heroImage){
+        const shot = $("#heroShot");
+        if (shot) shot.innerHTML = '<img src="'+api({action:"img",key:"hero/current.jpg"})+'" ' +
+          'alt="Inglemoor Viking football" onerror="this.parentNode.remove()">';
+      }
+    } catch(e){}
+
+    // only games that actually have photos
+    const withPhotos = games.filter(g => !g.tbd && counts[g.date] > 0);
+    if (!withPhotos.length){
+      $("#phGrid").innerHTML = '<div class="empty"><h4>Photos coming soon</h4>' +
+        '<p>Game photos will appear here through the season.</p></div>';
+      return;
+    }
+    withPhotos.reverse();                      // newest game first
+
+    $("#phLede").textContent = "Game by game, through the season.";
+    $("#phPills").innerHTML = withPhotos.map((g,i) =>
+      '<button class="pill" aria-pressed="'+(i===0)+'" data-i="'+i+'">' +
+        '<span class="p1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
+        '<span class="p2">' + MON[g.when.getMonth()] + ' ' + g.when.getDate() +
+          ' · ' + counts[g.date] + '</span>' +
+      '</button>').join("");
+
+    let shots = [], active = 0;
+
+    function layout(){
+      const wrap = $("#phGrid");
+      const W = wrap.clientWidth || 900;
+      const gap = 6, base = W < 640 ? 170 : 250;
+      // Rows alternate between taller and shorter, which changes how many
+      // photos fit on each one. Without this a set of identically shaped
+      // photos lays out as a plain equal grid.
+      const rhythm = W < 640 ? [1, 0.8] : [1, 0.8, 1.2];
+      let rowNo = 0;
+      const targetFor = n => base * rhythm[n % rhythm.length];
+      wrap.innerHTML = "";
+      let row = [], sum = 0, target = targetFor(0);
+      const flush = last => {
+        if (!row.length) return;
+        const avail = W - gap*(row.length-1);
+        let h = avail / sum;
+        if (last && h > target*1.45) h = target;
+        const div = document.createElement("div");
+        div.className = "row";
+        row.forEach(s => {
+          const t = document.createElement("div");
+          t.className = "tile" + (s.video ? " vid" : "");
+          t.style.width = Math.floor(h*s.r) + "px";
+          t.style.height = Math.floor(h) + "px";
+          t.dataset.i = s.i;
+          t.innerHTML = s.video
+            ? '<span class="ph">Video</span>'
+            : '<img src="'+api({action:"img",key:s.thumb})+'" alt="" loading="lazy">';
+          div.appendChild(t);
+        });
+        wrap.appendChild(div);
+        row = []; sum = 0;
+      };
+      const plan = [];
+      shots.forEach((s,i) => {
+        s.i = i; row.push(s); sum += s.r;
+        if (sum*target >= W){ plan.push(row); row = []; sum = 0; rowNo++; target = targetFor(rowNo); }
+      });
+      if (row.length) plan.push(row);
+      // a lone photo on the last row looks like a mistake — borrow one back
+      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
+        plan[plan.length-1].unshift(plan[plan.length-2].pop());
+      }
+      rowNo = 0;
+      plan.forEach((r,i) => {
+        row = r; sum = r.reduce((t,x) => t + x.r, 0);
+        target = targetFor(i);
+        flush(i === plan.length-1);
+      });
+    }
+
+    async function pick(k){
+      active = k;
+      $("#phPills").querySelectorAll(".pill").forEach((p,i) => p.setAttribute("aria-pressed", i===k));
+      $("#phGrid").innerHTML = '<p class="credit">Loading…</p>';
+      try {
+        const r = await fetch(api({action:"list", game: withPhotos[k].date}));
+        const d = await r.json();
+        shots = (d.files||[]).map(f => ({
+          key:f.key, thumb:f.thumb, video:f.video,
+          r: (f.w && f.h) ? (f.w/f.h) : 1.5
+        }));
+      } catch(e){ shots = []; }
+      layout();
+    }
+
+    $("#phPills").addEventListener("click", e => {
+      const b = e.target.closest(".pill"); if (!b) return;
+      pick(+b.dataset.i);
+    });
+    addEventListener("resize", () => { if (shots.length) layout(); });
+
+    /* lightbox, reusing the coach one's shape */
+    const lb = document.createElement("div");
+    lb.className = "plb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true");
+    lb.innerHTML = '<div class="plbstage">' +
+        '<button class="plbnav prev" aria-label="Previous">&larr;</button>' +
+        '<div class="plbbox" id="plbBox"></div>' +
+        '<button class="plbnav next" aria-label="Next">&rarr;</button>' +
+      '</div>' +
+      '<div class="plbfoot"><span id="plbMeta"></span>' +
+        '<button class="plbclose">Close</button></div>';
+    document.body.appendChild(lb);
+
+    let at = 0;
+    function open(i){
+      at = (i + shots.length) % shots.length;
+      const s = shots[at];
+      lb.querySelector("#plbBox").innerHTML = s.video
+        ? '<video src="'+api({action:"img",key:s.key})+'" controls autoplay playsinline></video>'
+        : '<img src="'+api({action:"img",key:s.key})+'" alt="">';
+      lb.querySelector("#plbMeta").textContent =
+        (withPhotos[active].home?"vs ":"at ") + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
+      lb.classList.add("on");
+    }
+    const close = () => { lb.classList.remove("on"); lb.querySelector("#plbBox").innerHTML = ""; };
+
+    $("#phGrid").addEventListener("click", e => {
+      const t = e.target.closest(".tile"); if (!t) return;
+      open(+t.dataset.i);
+    });
+    lb.addEventListener("click", e => {
+      if (e.target === lb || e.target.closest(".plbclose")) return close();
+      if (e.target.closest(".prev")) return open(at-1);
+      if (e.target.closest(".next")) return open(at+1);
+    });
+    document.addEventListener("keydown", e => {
+      if (!lb.classList.contains("on")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") open(at-1);
+      if (e.key === "ArrowRight") open(at+1);
+    });
+
+    // a Photos link on each played game in the schedule
+    document.querySelectorAll("#schedBody tr").forEach((tr,i) => {
+      const g = games[i]; if (!g || !counts[g.date]) return;
+      const cell = tr.lastElementChild; if (!cell) return;
+      const k = withPhotos.findIndex(x => x.date === g.date); if (k < 0) return;
+      cell.innerHTML = '<a class="photolink" href="#photos" data-jump="'+k+'">Photos · ' + counts[g.date] + '</a>';
+    });
+    document.addEventListener("click", e => {
+      const a = e.target.closest("[data-jump]"); if (!a) return;
+      pick(+a.dataset.jump);
+    });
+
+    pick(0);
+  })();
+
   /* ---- COMMITTED ---- */
   (function(){
     const list = SITE.committed || [];
     const m = $("#commitMount");
     if (!list.length){
       m.innerHTML = '<div class="empty"><h4>Coming soon</h4>' +
-        '<p>Vikings who signed to play college football will be listed here, grouped by class.</p></div>';
+        '<p>Vikings who signed to play college football will be listed here.</p></div>';
       return;
     }
-    const years = [...new Set(list.map(c => c.year))].sort((a,b) => b - a);
-    m.innerHTML = years.map((y,yi) =>
-      '<div class="commyear">' +
-        '<h3 class="subhead' + (yi === 0 ? " first" : "") + '">Class of ' + y + '</h3>' +
-        '<div class="commgrid">' + list.filter(c => c.year === y).map((c,i) =>
-          '<figure class="commit' + (c.art ? "" : " noart") + '" data-c="'+y+'-'+i+'">' +
-            (c.art
-              ? '<div class="cmart"><img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy"></div>'
-              : '') +
-            '<figcaption>' +
-              '<h4>'+c.name+'</h4>' +
-              '<p class="cmcol">'+c.college+'</p>' +
-              (c.position ? '<span class="cmpos">'+c.position+'</span>' : '') +
-            '</figcaption>' +
-          '</figure>').join("") +
-        '</div>' +
-      '</div>').join("");
 
-    /* tap the artwork to see it full size */
+    // same justified layout the photo gallery uses, so the tall poster and the
+    // wide ones sit together without cropping anything
+    const shots = list.slice().sort((a,b) => b.year - a.year);
+
+    function layout(){
+      const W = m.clientWidth || 900;
+      const gap = 10, base = W < 640 ? 190 : 260;
+      const rhythm = W < 640 ? [1, 0.85] : [1, 0.82, 1.18];
+      const targetFor = n => base * rhythm[n % rhythm.length];
+      m.innerHTML = "";
+      let row = [], sum = 0, rowNo = 0, target = targetFor(0);
+
+      const flush = (last) => {
+        if (!row.length) return;
+        const avail = W - gap*(row.length-1);
+        let h = avail / sum;
+        if (last && h > target*1.4) h = target;
+        const div = document.createElement("div");
+        div.className = "row";
+        row.forEach(c => {
+          const fig = document.createElement("figure");
+          fig.className = "commit";
+          fig.style.width  = Math.floor(h*c.r) + "px";
+          fig.style.height = Math.floor(h) + "px";
+          fig.dataset.i = c.i;
+          fig.innerHTML =
+            '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
+            '<span class="cmyear">'+c.year+'</span>' +
+            '<figcaption>' +
+              '<b>'+c.name+'</b>' +
+              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+            '</figcaption>';
+          div.appendChild(fig);
+        });
+        m.appendChild(div);
+        row = []; sum = 0;
+      };
+
+      const plan = [];
+      shots.forEach((c,i) => {
+        c.i = i; row.push(c); sum += c.r;
+        if (sum*target >= W){ plan.push(row); row=[]; sum=0; rowNo++; target=targetFor(rowNo); }
+      });
+      if (row.length) plan.push(row);
+      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
+        plan[plan.length-1].unshift(plan[plan.length-2].pop());
+      }
+      plan.forEach((r,i) => {
+        row = r; sum = r.reduce((t,x) => t + x.r, 0);
+        target = targetFor(i);
+        flush(i === plan.length-1);
+      });
+    }
+
+    // read each poster's real shape so nothing gets cropped
+    let pending = shots.length;
+    shots.forEach(c => {
+      const img = new Image();
+      img.onload  = () => { c.r = img.naturalWidth / img.naturalHeight; if (--pending === 0) layout(); };
+      img.onerror = () => { c.r = 1.78; if (--pending === 0) layout(); };
+      img.src = c.art;
+    });
+    addEventListener("resize", () => { if (shots.every(c => c.r)) layout(); });
+
+    /* full size on tap */
     const lb = document.createElement("div");
     lb.className = "plb";
     lb.innerHTML = '<div class="plbstage"><div class="plbbox" id="cmBox"></div></div>' +
@@ -1834,11 +2044,11 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     const close = () => { lb.classList.remove("on"); lb.querySelector("#cmBox").innerHTML = ""; };
 
     m.addEventListener("click", e => {
-      const f = e.target.closest(".commit"); if (!f || !f.querySelector("img")) return;
-      const [y,i] = f.dataset.c.split("-");
-      const c = list.filter(x => x.year == y)[+i];
+      const f = e.target.closest(".commit"); if (!f) return;
+      const c = shots[+f.dataset.i];
       lb.querySelector("#cmBox").innerHTML = '<img src="'+c.art+'" alt="'+c.name+'">';
-      lb.querySelector("#cmMeta").textContent = c.name + " · " + c.college;
+      lb.querySelector("#cmMeta").textContent =
+        "Class of " + c.year + " · " + c.name + " · " + c.college;
       lb.classList.add("on");
     });
     lb.addEventListener("click", e => {
@@ -1912,6 +2122,48 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '</div>' +
     '</details>';
   }).join("");
+
+  /* ---- highlight the section you are in ---- */
+  (function(){
+    const links = [...document.querySelectorAll('nav a[href^="#"]')]
+      .filter(a => a.getAttribute("href") !== "#top");
+    const targets = links
+      .map(a => ({ a, el: document.querySelector(a.getAttribute("href")) }))
+      .filter(t => t.el);
+    if (!targets.length) return;
+
+    const headerH = () => (document.querySelector("header")?.offsetHeight || 62) + 8;
+
+    let ticking = false;
+    function mark(){
+      ticking = false;
+      const line = headerH() + 1;
+      let current = null;
+      for (const t of targets){
+        const r = t.el.getBoundingClientRect();
+        if (r.top <= line && r.bottom > line) { current = t; break; }
+        if (r.top > line) break;              // sections are in document order
+        current = t;                          // last one that started above the line
+      }
+      // at the very bottom the last section wins, even if it is short
+      if (innerHeight + scrollY >= document.body.offsetHeight - 4){
+        current = targets[targets.length-1];
+      }
+      links.forEach(a => a.classList.remove("active"));
+      if (current) current.a.classList.add("active");
+    }
+
+    addEventListener("scroll", () => {
+      if (!ticking){ ticking = true; requestAnimationFrame(mark); }
+    }, { passive: true });
+    addEventListener("resize", mark);
+    document.querySelector("nav").addEventListener("click", e => {
+      const a = e.target.closest('a[href^="#"]'); if (!a) return;
+      links.forEach(x => x.classList.remove("active"));
+      if (a.getAttribute("href") !== "#top") a.classList.add("active");
+    });
+    mark();
+  })();
 
   /* ---- mobile menu ---- */
   const mb = $("#menuBtn"), nv = $("#nav");
