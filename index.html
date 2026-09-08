@@ -253,18 +253,23 @@ const SITE = {
      sponsors come in.
      --------------------------------------------------------- */
   sponsors: [
-    { name:"UBS",                            tier:"gold",   logo:"images/sponsors/ubs.png",          url:"" },
-    { name:"Gold 2",                         tier:"gold",   logo:"", url:"" },
-    { name:"Gold 3",                         tier:"gold",   logo:"", url:"" },
-    { name:"Gold 4",                         tier:"gold",   logo:"", url:"" },
-    { name:"Law Offices of Tara L. Eubanks", tier:"silver", logo:"images/sponsors/eubanks-law.png",  url:"" },
-    { name:"Silver 2",                       tier:"silver", logo:"", url:"" },
-    { name:"Silver 3",                       tier:"silver", logo:"", url:"" },
-    { name:"Silver 4",                       tier:"silver", logo:"", url:"" },
-    { name:"The Pizza Coop & Ale House",     tier:"bronze", logo:"images/sponsors/pizza-coop.png",   url:"" },
-    { name:"Community 2",                       tier:"bronze", logo:"", url:"" },
-    { name:"Community 3",                       tier:"bronze", logo:"", url:"" },
-    { name:"Community 4",                       tier:"bronze", logo:"", url:"" }
+    { name:"UBS",                      tier:"gold",   logo:"images/sponsors/ubs.png",                      url:"" },
+    { name:"Crumbl",                   tier:"gold",   logo:"images/sponsors/crumbl.png",                   url:"" },
+    { name:"Forney Financial",         tier:"gold",   logo:"images/sponsors/forney-financial.png",         url:"" },
+
+    { name:"47 North Oral Surgery",    tier:"silver", logo:"images/sponsors/47-north-oral-surgery.png",    url:"" },
+
+    { name:"Chick-fil-A Totem Lake",   tier:"bronze", logo:"images/sponsors/chick-fil-a-totem-lake.png",   url:"" },
+    { name:"Clements Orthodontics",    tier:"bronze", logo:"images/sponsors/clements-orthodontics.png",    url:"" },
+    { name:"Eubanks Law",              tier:"bronze", logo:"images/sponsors/eubanks-law.png",              url:"" },
+    { name:"Jessica's Unique Bite",    tier:"bronze", logo:"images/sponsors/jessicas-unique-bite.png",     url:"" },
+    { name:"Kenmore Self Storage",     tier:"bronze", logo:"images/sponsors/kenmore-self-storage.png",     url:"" },
+    { name:"La Corona Cocina Cantina", tier:"bronze", logo:"images/sponsors/la-corona.png",                url:"" },
+    { name:"Minahan Dental",           tier:"bronze", logo:"images/sponsors/minahan-dental.png",           url:"" },
+    { name:"Ostrom's Drug & Gift",     tier:"bronze", logo:"images/sponsors/ostroms-drug.png",             url:"" },
+    { name:"Pagliacci Pizza",          tier:"bronze", logo:"images/sponsors/pagliacci.png",                url:"" },
+    { name:"The Pizza Coop",           tier:"bronze", logo:"images/sponsors/pizza-coop.png",               url:"" },
+    { name:"Xcelerate Driving School", tier:"bronze", logo:"images/sponsors/xcelerate-driving-school.png", url:"" }
   ],
 
   // Tier labels and blurbs shown above each row.
@@ -620,22 +625,22 @@ nav a.navgold:hover{color:#FFC754}
 .tierrow::-webkit-scrollbar-track{background:transparent}
 
 .sponsor{flex:0 0 210px;scroll-snap-align:start;background:var(--bone);
-  border:1px solid var(--line);border-top:2px solid var(--line2);min-height:124px;padding:20px 22px;
+  border:1px solid var(--line);border-top:2px solid var(--line2);
+  height:126px;padding:12px 14px;
   display:grid;place-items:center;text-decoration:none;transition:.2s}
 .sponsor:hover{border-top-color:var(--gold);transform:translateY(-2px)}
-.sponsor img{max-width:100%;max-height:84px;object-fit:contain}
+/* fill the tile — a logo swimming in white space looks like a mistake */
+.sponsor img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
 /* empty slots stay dark and outlined, so a gap reads as a gap */
 .sponsor.empty{background:transparent;border:1px dashed var(--line2);
-  border-top-width:1px;min-height:124px}
+  border-top-width:1px;height:126px}
 .sponsor.empty:hover{background:var(--panel);border-color:var(--gold-deep);transform:none}
 .sponsor .ph{font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--line2);text-align:center}
-.tier-gold   .sponsor{flex-basis:260px;min-height:148px}
-.tier-gold   .sponsor img{max-height:104px}
-.tier-bronze .sponsor{flex-basis:190px;min-height:110px}
-.tier-bronze .sponsor img{max-height:70px}
+.tier-gold   .sponsor{flex-basis:270px;height:154px;padding:14px 16px}
+.tier-bronze .sponsor{flex-basis:196px;height:114px;padding:10px 12px}
 @media(max-width:560px){
-  .sponsor,.tier-gold .sponsor,.tier-bronze .sponsor{flex-basis:150px;min-height:92px}
+  .sponsor,.tier-gold .sponsor,.tier-bronze .sponsor{flex-basis:158px;height:98px;padding:9px 11px}
 }
 
 /* ---------- team calendar ---------- */

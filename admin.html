@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Scores — Inglemoor Football</title>
+<title>Site admin — Inglemoor Football</title>
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="apple-touch-icon" href="images/favicon.png">
 <meta name="theme-color" content="#FEB72E">
@@ -95,6 +95,14 @@ input:focus{border-color:var(--gold);outline:none}
 .status.good{color:var(--win)} .status.bad{color:var(--loss)} .status.busy{color:var(--gold)}
 .hide{display:none !important}
 
+.gwrap{margin-bottom:2px}
+.expand{background:var(--panel2);border:1px solid var(--gold-deep);border-top:none;
+  padding:18px 16px 20px}
+.expand > label:first-child{margin-top:0}
+.gbtn.open{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+details.notes.hero{margin-top:22px}
+details.notes.hero .inner{padding:0 22px 22px}
+
 .drop{border:1px dashed var(--line2);background:var(--ink);padding:30px 20px;
   text-align:center;cursor:pointer;transition:.18s;margin-top:4px}
 .drop:hover,.drop.over{border-color:var(--gold);background:var(--panel2)}
@@ -142,8 +150,8 @@ details.notes summary:hover{color:var(--bone)}
     <b>Inglemoor Football</b>
   </a>
 
-  <h1>Post a score</h1>
-  <p class="sub">Pick the game, type the final, save. That is all this page can do.</p>
+  <h1>Game updates</h1>
+  <p class="sub">Scores, photos and the hero image. Nothing else on the site can be changed from here.</p>
 
   <!-- password -->
   <div class="card gold" id="loginCard">
@@ -180,9 +188,10 @@ details.notes summary:hover{color:var(--bone)}
     <p class="status" id="saveStatus"></p>
   </div>
 
-  <!-- photos -->
-  <div class="card gold hide" id="photoCard">
-    <label id="photoLabel"></label>
+  <!-- photo panel, moved inline under whichever game is open -->
+  <div id="panelPark"></div>
+
+  <div class="expand hide" id="photoPanel">
     <div class="drop" id="drop">
       <b>Drop photos or video here</b>
       <span>or tap to choose &middot; JPG, PNG, MP4</span>
@@ -190,25 +199,25 @@ details.notes summary:hover{color:var(--bone)}
     </div>
     <div class="qgrid" id="queue"></div>
     <button class="btn hide" id="upBtn">Upload</button>
-    <p class="note">Photos are shrunk here before uploading. The originals stay on your device.</p>
-    <label style="margin-top:22px">Already on this game</label>
+    <label style="margin-top:20px">On this game</label>
     <div class="qgrid" id="existing"></div>
-    <button class="btn ghost" id="clearAll" style="margin-top:16px">Remove all from this game</button>
-    <button class="btn ghost" id="photoBack" style="margin-top:16px">Back</button>
     <p class="status" id="photoStatus"></p>
+    <button class="btn ghost" id="clearAll">Remove all from this game</button>
   </div>
 
-  <!-- hero -->
-  <div class="card hide" id="heroCard">
-    <label>Hero image &mdash; top of the site</label>
-    <div class="heroprev" id="heroPrev">None set</div>
-    <div class="drop" id="heroDrop" style="padding:22px">
-      <b style="font-size:18px">Replace hero</b>
-      <span>Drop it here or tap to choose &middot; one wide action shot</span>
-      <input type="file" id="heroPicker" accept="image/*" hidden>
+  <!-- hero, collapsed -->
+  <details class="notes hero hide" id="heroCard">
+    <summary>Hero image &mdash; top of the site</summary>
+    <div class="inner">
+      <div class="heroprev" id="heroPrev">None set</div>
+      <div class="drop" id="heroDrop" style="padding:22px">
+        <b style="font-size:18px">Replace hero</b>
+        <span>Drop it here or tap to choose &middot; one wide action shot</span>
+        <input type="file" id="heroPicker" accept="image/*" hidden>
+      </div>
+      <p class="status" id="heroStatus"></p>
     </div>
-    <p class="status" id="heroStatus"></p>
-  </div>
+  </details>
 
   <details class="notes">
     <summary>How this site works &mdash; for whoever comes next</summary>
@@ -308,20 +317,35 @@ async function loadCounts(){
 
 /* ---------- the game list ---------- */
 function renderGames(){
+  const panel = $("#photoPanel");
+  const openDate = (picked && !panel.classList.contains("hide")) ? picked.date : null;
+  // move the panel somewhere safe first — rewriting #games would destroy it
+  $("#panelPark").appendChild(panel);
   $("#games").innerHTML = games.map((g,i) => {
     const done = g.us !== null, won = done && g.us > g.them;
     const n = counts[g.date] || 0;
-    return '<div class="game' + (done ? " done" : "") + '">' +
+    return '<div class="gwrap" data-date="'+g.date+'">' +
+      '<div class="game' + (done ? " done" : "") + '">' +
       '<span><span class="g1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
         '<span class="g2">' + pretty(g.date) + '</span></span>' +
       '<button class="gbtn score ' + (done ? (won?"w":"l") : "") + '" data-score="'+i+'">' +
         (done ? '<span class="n">' + g.us + '–' + g.them + '</span>Score' : 'Add score') +
       '</button>' +
-      '<button class="gbtn ' + (n ? "has" : "") + '" data-photos="'+i+'">' +
+      '<button class="gbtn ' + (n ? "has" : "") + (openDate === g.date ? " open" : "") +
+        '" data-photos="'+i+'">' +
         (n ? '<span class="n">' + n + '</span>Photos' : 'Photos') +
       '</button>' +
+      '</div>' +
     '</div>';
   }).join("");
+  if (openDate) mountPanel(openDate);
+}
+
+// the panel is a single element that gets moved under whichever game is open
+function mountPanel(date){
+  const wrap = $("#games").querySelector('.gwrap[data-date="'+date+'"]');
+  const panel = $("#photoPanel");
+  if (wrap && panel) wrap.appendChild(panel);
 }
 
 /* ---------- login ---------- */
@@ -360,6 +384,7 @@ function openScore(g){
   $("#themLabel").textContent = g.opp.length > 12 ? "Them" : g.opp;
   $("#us").value   = g.us   !== null ? g.us   : "";
   $("#them").value = g.them !== null ? g.them : "";
+  closePhotos();
   show("#listCard", false); show("#heroCard", false); show("#entryCard", true);
   say($("#saveStatus"), "", ""); $("#us").focus();
 }
@@ -399,17 +424,25 @@ $("#saveBtn").addEventListener("click", async () => {
 
 /* ---------- photos ---------- */
 async function openPhotos(g){
+  const panel = $("#photoPanel");
+  const sameOne = picked && picked.date === g.date && !panel.classList.contains("hide");
+  if (sameOne){ closePhotos(); return; }
+
   picked = g; queue = [];
-  $("#photoLabel").textContent = "Photos · " + (g.home?"vs ":"at ") + g.opp + " · " + pretty(g.date);
   $("#queue").innerHTML = ""; show("#upBtn", false);
   say($("#photoStatus"), "", "");
-  show("#listCard", false); show("#heroCard", false); show("#photoCard", true);
+  mountPanel(g.date);
+  panel.classList.remove("hide");
+  document.querySelectorAll("[data-photos]").forEach(b => b.classList.remove("open"));
+  const btn = $("#games").querySelector('.gwrap[data-date="'+g.date+'"] [data-photos]');
+  if (btn) btn.classList.add("open");
   await refreshExisting();
 }
-$("#photoBack").addEventListener("click", async () => {
-  await loadCounts(); renderGames();
-  show("#photoCard", false); show("#listCard", true); show("#heroCard", true);
-});
+
+function closePhotos(){
+  $("#photoPanel").classList.add("hide");
+  document.querySelectorAll("[data-photos]").forEach(b => b.classList.remove("open"));
+}
 
 async function refreshExisting(){
   const el = $("#existing");
@@ -456,6 +489,7 @@ $("#clearAll").addEventListener("click", async () => {
     }
     await refreshExisting();
     await loadCounts();
+    renderGames();
     say($("#photoStatus"), "All removed.", "good");
   } catch(e){ say($("#photoStatus"), "Could not remove them.", "bad"); }
 });
@@ -603,6 +637,7 @@ $("#upBtn").addEventListener("click", async () => {
   show("#upBtn", queue.length > 0);
   await refreshExisting();
   await loadCounts();
+  renderGames();
   if (!failed) say($("#photoStatus"), "Uploaded. Live straight away.", "good");
   $("#upBtn").disabled = false;
 });
