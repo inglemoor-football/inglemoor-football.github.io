@@ -247,7 +247,7 @@ const SITE = {
      empty and the card shows initials instead.
      --------------------------------------------------------- */
   committed: [
-    { year:2025, name:"Brandon Henkens", college:"University of Puget Sound",      position:"DL",    art:"images/committed/henkens.jpg" },
+    { year:2025, name:"Brandon Henkens", college:"University of Puget Sound",      position:"DL",    art:"images/committed/henkens.jpg", feature:true },
     { year:2024, name:"Will Frank",      college:"Pacific Lutheran University",    position:"QB/CB", art:"images/committed/frank.jpg" },
     { year:2024, name:"Matteus Senna",   college:"University of Montana Western",  position:"WR/S",  art:"images/committed/senna.jpg" },
     { year:2020, name:"Trevor Thurman",  college:"Eastern Washington University",  position:"DE",    art:"images/committed/thurman.jpg" },
@@ -806,20 +806,31 @@ nav a.navgold.active{color:#FFC754}
 @media(max-width:640px){.plbnav{width:38px;height:38px;font-size:18px}}
 
 /* ---------- committed athletes ---------- */
-#commitMount{display:flex;flex-direction:column;gap:10px}
-#commitMount .row{display:flex;gap:10px}
+/* tall poster down the left across two rows, the wide ones two-up beside it.
+   Column widths are set so the cells land on each image's real shape. */
+#commitMount{display:grid;gap:10px;grid-template-columns:0.92fr 1fr 1fr;
+  grid-auto-flow:row dense}
 .commit{position:relative;margin:0;overflow:hidden;cursor:pointer;background:var(--panel2);
-  border:1px solid transparent;transition:border-color .15s}
+  border:1px solid transparent;transition:border-color .15s;aspect-ratio:16/9}
+.commit.feature{grid-column:1;grid-row:span 2;aspect-ratio:auto}
 .commit:hover{border-color:var(--gold)}
 .commit img{width:100%;height:100%;object-fit:cover;display:block}
 .cmyear{position:absolute;top:0;left:0;font-family:var(--cond);font-weight:700;
   font-size:12px;letter-spacing:.16em;background:var(--gold);color:var(--ink);padding:5px 11px}
-.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 10px;
-  background:linear-gradient(180deg,transparent,rgba(10,11,13,.92) 55%)}
+.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:28px 13px 11px;
+  background:linear-gradient(180deg,transparent,rgba(10,11,13,.93) 55%)}
 .commit figcaption b{display:block;font-family:var(--display);font-weight:800;font-size:19px;
   line-height:1.05;text-transform:uppercase;color:var(--bone)}
 .commit figcaption span{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
   letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-top:2px}
+@media(max-width:860px){
+  #commitMount{grid-template-columns:1fr 1fr}
+  .commit.feature{grid-column:1;grid-row:span 2}
+}
+@media(max-width:560px){
+  #commitMount{grid-template-columns:1fr}
+  .commit.feature{grid-column:auto;grid-row:auto;aspect-ratio:4/5}
+}
 
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
@@ -1970,72 +1981,22 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         '<p>Vikings who signed to play college football will be listed here.</p></div>';
       return;
     }
+    // newest first, with the tall poster pulled out to run down the left
+    const sorted = list.slice().sort((a,b) => b.year - a.year);
+    const feat = sorted.filter(c => c.feature);
+    const rest = sorted.filter(c => !c.feature);
+    const order = [...feat, ...rest];
 
-    // same justified layout the photo gallery uses, so the tall poster and the
-    // wide ones sit together without cropping anything
-    const shots = list.slice().sort((a,b) => b.year - a.year);
+    m.innerHTML = order.map((c,i) =>
+      '<figure class="commit' + (c.feature ? " feature" : "") + '" data-i="'+i+'">' +
+        '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
+        '<span class="cmyear">'+c.year+'</span>' +
+        '<figcaption>' +
+          '<b>'+c.name+'</b>' +
+          '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+        '</figcaption>' +
+      '</figure>').join("");
 
-    function layout(){
-      const W = m.clientWidth || 900;
-      const gap = 10, base = W < 640 ? 190 : 260;
-      const rhythm = W < 640 ? [1, 0.85] : [1, 0.82, 1.18];
-      const targetFor = n => base * rhythm[n % rhythm.length];
-      m.innerHTML = "";
-      let row = [], sum = 0, rowNo = 0, target = targetFor(0);
-
-      const flush = (last) => {
-        if (!row.length) return;
-        const avail = W - gap*(row.length-1);
-        let h = avail / sum;
-        if (last && h > target*1.4) h = target;
-        const div = document.createElement("div");
-        div.className = "row";
-        row.forEach(c => {
-          const fig = document.createElement("figure");
-          fig.className = "commit";
-          fig.style.width  = Math.floor(h*c.r) + "px";
-          fig.style.height = Math.floor(h) + "px";
-          fig.dataset.i = c.i;
-          fig.innerHTML =
-            '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
-            '<span class="cmyear">'+c.year+'</span>' +
-            '<figcaption>' +
-              '<b>'+c.name+'</b>' +
-              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
-            '</figcaption>';
-          div.appendChild(fig);
-        });
-        m.appendChild(div);
-        row = []; sum = 0;
-      };
-
-      const plan = [];
-      shots.forEach((c,i) => {
-        c.i = i; row.push(c); sum += c.r;
-        if (sum*target >= W){ plan.push(row); row=[]; sum=0; rowNo++; target=targetFor(rowNo); }
-      });
-      if (row.length) plan.push(row);
-      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
-        plan[plan.length-1].unshift(plan[plan.length-2].pop());
-      }
-      plan.forEach((r,i) => {
-        row = r; sum = r.reduce((t,x) => t + x.r, 0);
-        target = targetFor(i);
-        flush(i === plan.length-1);
-      });
-    }
-
-    // read each poster's real shape so nothing gets cropped
-    let pending = shots.length;
-    shots.forEach(c => {
-      const img = new Image();
-      img.onload  = () => { c.r = img.naturalWidth / img.naturalHeight; if (--pending === 0) layout(); };
-      img.onerror = () => { c.r = 1.78; if (--pending === 0) layout(); };
-      img.src = c.art;
-    });
-    addEventListener("resize", () => { if (shots.every(c => c.r)) layout(); });
-
-    /* full size on tap */
     const lb = document.createElement("div");
     lb.className = "plb";
     lb.innerHTML = '<div class="plbstage"><div class="plbbox" id="cmBox"></div></div>' +
@@ -2045,7 +2006,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     m.addEventListener("click", e => {
       const f = e.target.closest(".commit"); if (!f) return;
-      const c = shots[+f.dataset.i];
+      const c = order[+f.dataset.i];
       lb.querySelector("#cmBox").innerHTML = '<img src="'+c.art+'" alt="'+c.name+'">';
       lb.querySelector("#cmMeta").textContent =
         "Class of " + c.year + " · " + c.name + " · " + c.college;
