@@ -252,7 +252,9 @@ const SITE = {
     { year:2024, name:"Will Frank",      college:"Pacific Lutheran University",    position:"QB/CB", art:"images/committed/frank.jpg" },
     { year:2024, name:"Matteus Senna",   college:"University of Montana Western",  position:"WR/S",  art:"images/committed/senna.jpg" },
     { year:2020, name:"Trevor Thurman",  college:"Eastern Washington University",  position:"DE",    art:"images/committed/thurman.jpg" },
-    { year:2019, name:"Quentin Moore",   college:"University of Washington",       position:"TE",    art:"images/committed/moore.jpg" }
+    { year:2019, name:"Quentin Moore",   college:"University of Washington",       position:"TE",    art:"images/committed/moore.jpg",
+      badge:"NFL", note:"Signed with the Washington Commanders",
+      link:"https://www.instagram.com/p/Dc6kKRilFlT/" }
   ],
 
   /* ---- SPONSORS -------------------------------------------
@@ -807,20 +809,32 @@ nav a.navgold.active{color:#FFC754}
 @media(max-width:640px){.plbnav{width:38px;height:38px;font-size:18px}}
 
 /* ---------- committed athletes ---------- */
-#commitMount{display:flex;flex-direction:column;gap:10px}
-#commitMount .row{display:flex;gap:10px}
+/* posters keep their own shape — every row the same height, so nothing
+   looks more important than anything else */
+#commitMount{display:flex;flex-direction:column;gap:12px}
+#commitMount .row{display:flex;gap:12px}
+#commitMount .row.short{justify-content:center}
 .commit{position:relative;margin:0;overflow:hidden;cursor:pointer;background:var(--panel2);
   border:1px solid transparent;transition:border-color .15s}
 .commit:hover{border-color:var(--gold)}
 .commit img{width:100%;height:100%;object-fit:cover;display:block}
 .cmyear{position:absolute;top:0;left:0;font-family:var(--cond);font-weight:700;
   font-size:12px;letter-spacing:.16em;background:var(--gold);color:var(--ink);padding:5px 11px}
-.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:28px 13px 11px;
-  background:linear-gradient(180deg,transparent,rgba(10,11,13,.93) 55%)}
+.cmbadge{position:absolute;top:0;right:0;font-family:var(--cond);font-weight:700;
+  font-size:12px;letter-spacing:.18em;background:var(--ink);color:var(--gold);
+  padding:5px 11px;border-left:1px solid var(--gold-deep);border-bottom:1px solid var(--gold-deep)}
+.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 13px 11px;
+  background:linear-gradient(180deg,transparent,rgba(10,11,13,.94) 55%)}
 .commit figcaption b{display:block;font-family:var(--display);font-weight:800;font-size:19px;
   line-height:1.05;text-transform:uppercase;color:var(--bone)}
 .commit figcaption span{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
   letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-top:2px}
+.commit figcaption em{display:block;font-style:normal;font-family:var(--cond);font-weight:700;
+  font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold);margin-top:3px}
+.cmlink{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--gold);text-decoration:none;
+  border:1px solid var(--gold-deep);padding:9px 16px;margin-right:10px}
+.cmlink:hover{background:var(--gold);color:var(--ink)}
 
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
@@ -1251,7 +1265,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     <div class="wrap">
       <p class="eyebrow">Next level</p>
       <h2 class="sec">Committed</h2>
-      <p class="lede">Vikings who went on to play college football.</p>
+      <p class="lede">Vikings who went on to play college football and beyond.</p>
       <div id="commitMount"></div>
     </div>
   </section>
@@ -1975,20 +1989,32 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     function layout(){
       const W = m.clientWidth || 900;
-      const gap = 10, base = W < 640 ? 200 : 280;
-      const rhythm = W < 640 ? [1, 0.86] : [1, 0.84, 1.16];
-      const targetFor = n => base * rhythm[n % rhythm.length];
+      const gap = 12, target = W < 640 ? 210 : 240;
       m.innerHTML = "";
-      let row = [], sum = 0, target = targetFor(0);
 
-      const flush = (last) => {
-        if (!row.length) return;
-        const avail = W - gap*(row.length-1);
-        let h = avail / sum;
-        if (last && h > target*1.4) h = target;
+      // group into rows at a constant target height — no rhythm, because
+      // varying the height is what made older posters look more important
+      const plan = []; let row = [], sum = 0;
+      shots.forEach((c,i) => {
+        c.i = i; row.push(c); sum += c.r;
+        if (sum*target >= W){ plan.push(row); row = []; sum = 0; }
+      });
+      if (row.length) plan.push(row);
+
+      let firstH = null;
+      plan.forEach((r, ri) => {
+        const total = r.reduce((t,x) => t + x.r, 0);
+        const avail = W - gap*(r.length-1);
+        const justified = avail / total;
+        // the final row keeps the height of the rows above instead of being
+        // stretched to fill, then sits centred
+        const last = ri === plan.length-1;
+        const h = (last && firstH) ? Math.min(firstH, justified) : justified;
+        if (firstH === null) firstH = h;
+
         const div = document.createElement("div");
-        div.className = "row";
-        row.forEach(c => {
+        div.className = "row" + (last && h < justified ? " short" : "");
+        r.forEach(c => {
           const fig = document.createElement("figure");
           fig.className = "commit";
           fig.style.width  = Math.floor(h*c.r) + "px";
@@ -1997,32 +2023,18 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           fig.innerHTML =
             '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
             '<span class="cmyear">'+c.year+'</span>' +
+            (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') +
             '<figcaption><b>'+c.name+'</b>' +
-              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span></figcaption>';
+              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+              (c.note ? '<em>'+c.note+'</em>' : '') +
+            '</figcaption>';
           div.appendChild(fig);
         });
         m.appendChild(div);
-        row = []; sum = 0;
-      };
-
-      const plan = [];
-      let rowNo = 0;
-      shots.forEach((c,i) => {
-        c.i = i; row.push(c); sum += c.r;
-        if (sum*target >= W){ plan.push(row); row=[]; sum=0; rowNo++; target=targetFor(rowNo); }
-      });
-      if (row.length) plan.push(row);
-      if (plan.length > 1 && plan[plan.length-1].length === 1 && plan[plan.length-2].length > 2){
-        plan[plan.length-1].unshift(plan[plan.length-2].pop());
-      }
-      plan.forEach((r,i) => {
-        row = r; sum = r.reduce((t,x) => t + x.r, 0);
-        target = targetFor(i);
-        flush(i === plan.length-1);
       });
     }
 
-    // measure each poster so nothing is cropped
+    // read each poster's real shape, so nothing is ever cropped
     let pending = shots.length;
     shots.forEach(c => {
       const img = new Image();
@@ -2034,24 +2046,45 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     const lb = document.createElement("div");
     lb.className = "plb";
-    lb.innerHTML = '<div class="plbstage"><div class="plbbox" id="cmBox"></div></div>' +
-      '<div class="plbfoot"><span id="cmMeta"></span><button class="plbclose">Close</button></div>';
+    lb.innerHTML = '<div class="plbstage">' +
+        '<button class="plbnav prev" aria-label="Previous">&larr;</button>' +
+        '<div class="plbbox" id="cmBox"></div>' +
+        '<button class="plbnav next" aria-label="Next">&rarr;</button>' +
+      '</div>' +
+      '<div class="plbfoot"><span id="cmMeta"></span>' +
+        '<span><a class="cmlink hide" id="cmLink" target="_blank" rel="noopener">See the post</a>' +
+        '<button class="plbclose">Close</button></span></div>';
     document.body.appendChild(lb);
+
+    let at = 0;
+    function open(i){
+      at = (i + shots.length) % shots.length;
+      const c = shots[at];
+      lb.querySelector("#cmBox").innerHTML = '<img src="'+c.art+'" alt="'+c.name+'">';
+      lb.querySelector("#cmMeta").textContent =
+        "Class of " + c.year + " · " + c.name + " · " + c.college + (c.note ? " · " + c.note : "");
+      const a = lb.querySelector("#cmLink");
+      if (c.link){ a.href = c.link; a.classList.remove("hide"); }
+      else a.classList.add("hide");
+      lb.classList.add("on");
+    }
     const close = () => { lb.classList.remove("on"); lb.querySelector("#cmBox").innerHTML = ""; };
 
     m.addEventListener("click", e => {
       const f = e.target.closest(".commit"); if (!f) return;
-      const c = shots[+f.dataset.i];
-      lb.querySelector("#cmBox").innerHTML = '<img src="'+c.art+'" alt="'+c.name+'">';
-      lb.querySelector("#cmMeta").textContent =
-        "Class of " + c.year + " · " + c.name + " · " + c.college;
-      lb.classList.add("on");
+      open(+f.dataset.i);
     });
     lb.addEventListener("click", e => {
-      if (e.target === lb || e.target.closest(".plbclose")) close();
+      if (e.target.closest(".cmlink")) return;
+      if (e.target === lb || e.target.closest(".plbclose")) return close();
+      if (e.target.closest(".prev")) return open(at-1);
+      if (e.target.closest(".next")) return open(at+1);
     });
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape" && lb.classList.contains("on")) close();
+      if (!lb.classList.contains("on")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") open(at-1);
+      if (e.key === "ArrowRight") open(at+1);
     });
   })();
 
