@@ -73,7 +73,7 @@ const SITE = {
      the footer note both disappear.
      --------------------------------------------------------- */
   preview: {
-    show: true,
+    show: false,
     label: "Preview",
     text: "This is a work-in-progress preview at a temporary address. The live site is still inglemoorfootball.com. Roster, sponsor logos and coach photos are still to come."
   },
@@ -247,6 +247,7 @@ const SITE = {
      empty and the card shows initials instead.
      --------------------------------------------------------- */
   committed: [
+    { year:2027, name:"Ben Rainwater",   college:"Boise State University",          position:"OT",    art:"images/committed/rainwater.jpg" },
     { year:2026, name:"Zach Eubanks",    college:"Whitworth University",           position:"DB",    art:"images/committed/eubanks.jpg" },
     { year:2025, name:"Brandon Henkens", college:"University of Puget Sound",      position:"DL",    art:"images/committed/henkens.jpg" },
     { year:2024, name:"Will Frank",      college:"Pacific Lutheran University",    position:"QB/CB", art:"images/committed/frank.jpg" },
@@ -829,8 +830,7 @@ nav a.navgold.active{color:#FFC754}
 /* posters keep their own shape — every row the same height, so nothing
    looks more important than anything else */
 #commitMount{display:flex;flex-direction:column;gap:12px}
-#commitMount .row{display:flex;gap:12px}
-#commitMount .row.short{justify-content:center}
+#commitMount .row{display:flex;gap:12px;justify-content:center}
 .commit{position:relative;margin:0;overflow:hidden;cursor:pointer;background:var(--panel2);
   border:1px solid transparent;transition:border-color .15s}
 .commit:hover{border-color:var(--gold)}
@@ -2036,7 +2036,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     function layout(){
       const W = m.clientWidth || 900;
-      const gap = 12, target = 240;
+      const gap = 12, target = 230;
       m.innerHTML = "";
 
       // On a phone these get too small for the caption to sit over them,
@@ -2065,33 +2065,28 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         return;
       }
 
-      // group into rows at a constant target height — no rhythm, because
-      // varying the height is what made older posters look more important
-      const plan = []; let row = [], sum = 0;
+      // Every tile is the same height, full stop. Rows are packed to fit and
+      // then centred — justifying rows to the page edge is what made some
+      // posters look more important than others.
+      const H = target;
+      const plan = []; let row = [], used = 0;
       shots.forEach((c,i) => {
-        c.i = i; row.push(c); sum += c.r;
-        if (sum*target >= W){ plan.push(row); row = []; sum = 0; }
+        c.i = i;
+        const wpx = H * c.r;
+        const next = used ? used + gap + wpx : wpx;
+        if (row.length && next > W){ plan.push(row); row = [c]; used = wpx; }
+        else { row.push(c); used = next; }
       });
       if (row.length) plan.push(row);
 
-      let firstH = null;
-      plan.forEach((r, ri) => {
-        const total = r.reduce((t,x) => t + x.r, 0);
-        const avail = W - gap*(r.length-1);
-        const justified = avail / total;
-        // the final row keeps the height of the rows above instead of being
-        // stretched to fill, then sits centred
-        const last = ri === plan.length-1;
-        const h = (last && firstH) ? Math.min(firstH, justified) : justified;
-        if (firstH === null) firstH = h;
-
+      plan.forEach(r => {
         const div = document.createElement("div");
-        div.className = "row" + (last && h < justified ? " short" : "");
+        div.className = "row";
         r.forEach(c => {
           const fig = document.createElement("figure");
           fig.className = "commit";
-          fig.style.width  = Math.floor(h*c.r) + "px";
-          fig.style.height = Math.floor(h) + "px";
+          fig.style.width  = Math.floor(H*c.r) + "px";
+          fig.style.height = Math.floor(H) + "px";
           fig.dataset.i = c.i;
           fig.innerHTML =
             '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
