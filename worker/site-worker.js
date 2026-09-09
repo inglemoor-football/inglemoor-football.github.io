@@ -50,6 +50,8 @@ export default {
         return json({ ok: false, error: "Wrong password." }, 401, cors);
       }
 
+      // lets the admin page check the password before showing anything
+      if (action === "check")  return json({ ok: true }, 200, cors);
       if (action === "score")  return saveScore(request, env, cors);
       if (action === "upload") return upload(request, url, env, cors);
       if (action === "delete") return remove(url, env, cors);

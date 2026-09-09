@@ -353,6 +353,23 @@ async function enter(){
   const val = $("#pw").value.trim();
   if (!val){ say($("#loginStatus"), "Enter the password.", "bad"); return; }
   pw = val;
+  say($("#loginStatus"), "Checking…", "busy");
+
+  // ask the Worker whether this password is right before showing anything
+  try {
+    const r = await fetch(api({action:"check"}), { method:"POST", headers:{ "X-Auth": pw } });
+    const d = await r.json();
+    if (!d.ok){
+      say($("#loginStatus"), d.error || "Wrong password.", "bad");
+      try { localStorage.removeItem(KEY); } catch(e){}
+      $("#pw").value = ""; $("#pw").focus();
+      return;
+    }
+  } catch(e){
+    say($("#loginStatus"), "Could not reach the server. Try again.", "bad");
+    return;
+  }
+
   say($("#loginStatus"), "Loading…", "busy");
   try { games = await loadGames(); }
   catch(e){ say($("#loginStatus"), "Could not load the schedule.", "bad"); return; }
