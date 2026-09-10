@@ -22,8 +22,19 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const action = url.searchParams.get("action") || "";
+    // ALLOWED_ORIGIN may hold several origins separated by commas.
+    // Echo back whichever one the request actually came from — a browser
+    // will not accept a list in this header.
+    const from = request.headers.get("Origin") || "";
+    const allowed = (env.ALLOWED_ORIGIN || "*")
+      .split(",").map(x => x.trim()).filter(Boolean);
+    const origin = allowed.includes("*") ? "*"
+                 : allowed.includes(from) ? from
+                 : allowed[0] || "*";
+
     const cors = {
-      "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "*",
+      "Access-Control-Allow-Origin": origin,
+      "Vary": "Origin",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, X-Auth",
       "Access-Control-Max-Age": "86400",

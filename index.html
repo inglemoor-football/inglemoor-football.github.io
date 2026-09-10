@@ -296,13 +296,13 @@ const SITE = {
     { key:"bronze", label:"Community", note:"" }
   ],
 
-  /* ---- DONATE & FEES ---------------------------------------
+  /* ---- DONATE ---------------------------------------
      The Zeffy pages. An item can carry one "url", or a "links"
      array when there is more than one place to go.
      --------------------------------------------------------- */
   support: [
     { t:"Pay booster dues",
-      d:"Separate from the school's athletic fee. Dues fund the things that make the program run: film, team meals, equipment, and travel. Paying in the spring helps spread out the cost before the school's athletic fee comes due in the fall.",
+      d:"Dues fund the things that make the program run: film, team meals, equipment, and travel. Paying in the spring helps spread the cost out ahead of the fall.",
       url:"https://www.zeffy.com/en-US/ticketing/2026-booster-dues-2",
       cta:"Pay dues" },
 
@@ -485,6 +485,7 @@ nav a.navgold.active{color:#FFC754}
 .herostats .v.g{color:var(--gold)}
 .herostats .v.w{color:var(--win)}
 .herostats .v.l{color:var(--loss)}
+.herostats .v.t{color:var(--gold)}
 .herostats small{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
   letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-top:5px}
 @media(max-width:560px){
@@ -932,7 +933,7 @@ table.sched tr:hover td{background:rgba(240,180,41,.03)}
 .opp em{font-style:normal;color:var(--mute);font-family:var(--cond);font-weight:600;
   font-size:14px;letter-spacing:.1em;display:block}
 .res{font-family:var(--cond);font-weight:700;font-size:17px;letter-spacing:.06em;white-space:nowrap}
-.res.w{color:var(--win)} .res.l{color:var(--loss)} .res.p{color:var(--mute);font-size:14px;letter-spacing:.14em}
+.res.w{color:var(--win)} .res.l{color:var(--loss)} .res.t{color:var(--gold)} .res.p{color:var(--mute);font-size:14px;letter-spacing:.14em}
 .tag{font-family:var(--cond);font-weight:600;font-size:11px;letter-spacing:.15em;
   text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-deep);
   padding:2px 7px;border-radius:2px;white-space:nowrap}
@@ -1167,11 +1168,11 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </div>
   </section>
 
-  <!-- DONATE & FEES -->
+  <!-- DONATE -->
   <section id="donate">
     <div class="wrap">
       <p class="eyebrow">Chip in</p>
-      <h2 class="sec">Donate &amp; fees</h2>
+      <h2 class="sec">Donate</h2>
       <p class="lede" id="donateLede"></p>
       <div class="cards" id="supportGrid"></div>
     </div>
@@ -1344,6 +1345,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       live: !played && t >= when && t < ends,
       awaiting: !played && t >= ends,
       won: played ? g.us > g.them : null,
+      tie: played ? g.us === g.them : false,
       home: g.at === "home",
       tbd: false
     });
@@ -1360,7 +1362,9 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
   const done = games.filter(g => g.played);
   const W = done.filter(g => g.won).length;
-  const L = done.length - W;
+  const T = done.filter(g => g.tie).length;
+  const L = done.length - W - T;
+  const recStr = T ? W + "–" + L + "–" + T : W + "–" + L;
   const lgDone = done.filter(g => g.league);
   const lgW = lgDone.filter(g => g.won).length;
   const homeDone = done.filter(g => g.home);
@@ -1406,15 +1410,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       const cells = [];
       cells.push(
         '<div><span class="k">Record</span>' +
-        '<span class="v g">' + (done.length ? W + "–" + L : "0–0") + '</span>' +
+        '<span class="v g">' + (done.length ? recStr : "0–0") + '</span>' +
         '<small>' + SITE.team.league + '</small></div>');
 
       const lastGame = done[done.length-1];
       if (lastGame){
         cells.push(
           '<div><span class="k">Last out</span>' +
-          '<span class="v ' + (lastGame.won ? "w" : "l") + '">' +
-            (lastGame.won ? "W " : "L ") + lastGame.us + "–" + lastGame.them + '</span>' +
+          '<span class="v ' + (lastGame.tie ? "t" : lastGame.won ? "w" : "l") + '">' +
+            (lastGame.tie ? "T " : lastGame.won ? "W " : "L ") +
+            lastGame.us + "–" + lastGame.them + '</span>' +
           '<small>' + (lastGame.home ? "vs " : "at ") + lastGame.opp + ' · ' +
             MON[lastGame.when.getMonth()] + ' ' + lastGame.when.getDate() + '</small></div>');
       } else if (games[0]) {
@@ -1498,7 +1503,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '</tr>';
     }
     let res;
-    if (g.played) res = '<span class="res '+(g.won?"w":"l")+'">'+(g.won?"W":"L")+" "+g.us+"–"+g.them+'</span>';
+    if (g.played) res = '<span class="res '+(g.tie?"t":g.won?"w":"l")+'">' +
+      (g.tie?"T":g.won?"W":"L")+" "+g.us+"–"+g.them+'</span>';
     else if (g.live) res = '<span class="tag live"><i></i>In progress</span>';
     else if (g.awaiting) res = '<span class="res p">Final &middot; score pending</span>';
     else if (next && g.i === next.i) res = '<span class="tag">Next up</span>';
@@ -1518,7 +1524,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   }).join("");
 
   /* ---- SIDEBAR RECORD ---- */
-  $("#recBig").textContent = done.length ? W + "–" + L : "0–0";
+  $("#recBig").textContent = done.length ? recStr : "0–0";
 
   /* ---- TEAM CALENDAR ---- */
   (async function(){
@@ -1833,7 +1839,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
   $("#donateLede").textContent =
     "Booster dues, donations and spirit wear all run through Zeffy. Every dollar goes back into the program. " +
-    SITE.boosters.legalName + " is a " + SITE.boosters.status.toLowerCase() + ".";
+    SITE.boosters.legalName + " is a " + SITE.boosters.status.toLowerCase() +
+    ", and all booster dues and donations are 100% tax deductible.";
 
   /* ---- VOLUNTEER ---- */
   (function(){
@@ -2191,23 +2198,25 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   /* ---- PAST SEASONS ---- */
   $("#archiveMount").innerHTML = (SITE.archive||[]).map(sn => {
     const w  = sn.games.filter(g => g.us > g.them).length;
-    const l  = sn.games.length - w;
+    const t  = sn.games.filter(g => g.us === g.them).length;
+    const l  = sn.games.length - w - t;
     const pf = sn.games.reduce((t,g) => t + g.us, 0);
     const pa = sn.games.reduce((t,g) => t + g.them, 0);
     const rows = sn.games.map(g => {
-      const won = g.us > g.them;
+      const won = g.us > g.them, tied = g.us === g.them;
       return '<tr>' +
         '<td class="ad">' + g.date + '</td>' +
         '<td class="ao">' + (g.at === "home" ? "vs " : "at ") + g.opp +
           (g.league ? ' <span class="lg">League</span>' : '') +
           (g.note ? ' <span class="lg">'+g.note+'</span>' : '') + '</td>' +
-        '<td><span class="res ' + (won ? "w" : "l") + '">' + (won ? "W" : "L") + " " + g.us + "–" + g.them + '</span></td>' +
+        '<td><span class="res ' + (tied ? "t" : won ? "w" : "l") + '">' +
+          (tied ? "T" : won ? "W" : "L") + " " + g.us + "–" + g.them + '</span></td>' +
       '</tr>';
     }).join("");
     return '<details class="season">' +
       '<summary>' +
         '<span class="yr">' + sn.year + '</span>' +
-        '<span class="rec">' + w + '–' + l + '</span>' +
+        '<span class="rec">' + (t ? w+'–'+l+'–'+t : w+'–'+l) + '</span>' +
         '<span class="meta">' + (sn.coach ? sn.coach + ' · ' : '') + (sn.note || '') + '</span>' +
         '<span class="chev" aria-hidden="true"></span>' +
       '</summary>' +
