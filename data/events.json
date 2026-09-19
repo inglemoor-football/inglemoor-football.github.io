@@ -1,19 +1,7 @@
 {
- "updated": "2026-09-18T22:52:16-07:00",
+ "updated": "2026-09-19T03:56:19-07:00",
  "windowDays": 180,
  "events": [
-  {
-   "start": "2026-09-18T16:00:00-07:00",
-   "allDay": false,
-   "title": "Team Practice",
-   "location": ""
-  },
-  {
-   "start": "2026-09-18T19:00:00-07:00",
-   "allDay": false,
-   "title": "Varsity game vs. Mercer Island",
-   "location": "Pop Keeney Stadium, 9809 NE 188th St, Bothell, WA 98011, USA"
-  },
   {
    "start": "2026-09-21T16:00:00-07:00",
    "allDay": false,
