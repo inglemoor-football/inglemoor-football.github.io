@@ -1510,8 +1510,10 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     else if (next && g.i === next.i) res = '<span class="tag">Next up</span>';
     else res = '<span class="res p">'+fmtTime(g.when)+'</span>';
 
+    // played games leave this cell empty unless there are photos, which the
+    // photos section fills in later — no sending people off to another site
     const watch = g.played
-      ? (SITE.links.maxpreps ? '<a class="mini" href="'+SITE.links.maxpreps+'" target="_blank" rel="noopener">Box score</a>' : "")
+      ? ""
       : (SITE.links.stream ? '<a class="mini" href="'+SITE.links.stream+'" target="_blank" rel="noopener">Watch</a>' : "");
 
     return '<tr>' +
@@ -2223,7 +2225,6 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       '<div class="seasonbody">' +
         '<table class="atable"><tbody>' + rows + '</tbody></table>' +
         '<p class="atotals">' + sn.games.length + ' games · ' + pf + ' points for · ' + pa + ' points against' +
-          (sn.link ? ' · <a class="mini" href="'+sn.link+'" target="_blank" rel="noopener">Box scores on MaxPreps &rarr;</a>' : '') +
         '</p>' +
       '</div>' +
     '</details>';
