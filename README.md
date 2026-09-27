@@ -12,6 +12,7 @@ domain renewal.
     index.html      The entire website — content, styling and logic
     admin.html      Private page for posting scores and photos
     preview.bat     Double-click to preview the site before pushing
+    HANDOVER.md     Full technical notes — infrastructure, process, history
     images/         Logos, coach headshots, sponsors, commitments
     data/           Calendar feed — written automatically, don't edit
     scripts/        Fetches the Google Calendar
@@ -33,9 +34,10 @@ R2 storage, not to git.
 
 ### 2. Editing index.html — for everything else
 
-Rosters, coaches, board members, sponsors, commitments and all the
-written copy live in the `SITE` block at the top of `index.html`,
-in the first ~250 lines. Every section is commented.
+Rosters, coaches, board members, sponsors, commitments, the spirit
+wear stores and all the written copy live in the `SITE` block at the
+top of `index.html`, in the first ~380 lines. Every section is
+commented.
 
 Edit it on github.com or with GitHub Desktop, commit, and it is
 live in about a minute.
@@ -46,8 +48,8 @@ black window when you're done.
 
 ## What updates itself
 
-  - **Calendar** — pulled from the football Google Calendar three
-    times a day by a GitHub Action. Change the calendar, the site follows.
+  - **Calendar** — pulled from the football Google Calendar every
+    hour by a GitHub Action. Change the calendar, the site follows.
   - **Countdown and game states** — the countdown, the "in progress"
     badge at kickoff and "score pending" afterwards are all worked
     out from the kickoff time. Nobody triggers them.

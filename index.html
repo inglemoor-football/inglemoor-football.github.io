@@ -41,7 +41,7 @@ const SITE = {
 
   /* ---- TEAM CALENDAR ---------------------------------------
      Events come from the public Google Calendar, refreshed
-     into data/events.json three times a day by the
+     into data/events.json every hour by the
      "Refresh calendar" GitHub Action. Nothing to edit here —
      change the calendar in Google and the site follows.
 
@@ -261,15 +261,15 @@ const SITE = {
   ],
 
   /* ---- SPONSORS -------------------------------------------
-     Three tiers: gold, silver, bronze. Each tier scrolls
-     sideways, so you can add as many as you sell.
+     Three tiers: gold, silver, bronze (shown as "Community").
+     Each tier is a grid that wraps onto more rows as you add
+     sponsors, so there's no limit.
 
      "logo" is an image filename — drop files into
      images/sponsors/ and set logo:"images/sponsors/acme.png".
      Left empty, the tile shows the business name as text.
-
-     These twelve are placeholders. Replace them as real
-     sponsors come in.
+     Tiles are light, so a logo on white or transparent works.
+     Leave url:"" and the tile isn't a link.
      --------------------------------------------------------- */
   sponsors: [
     { name:"UBS",                      tier:"gold",   logo:"images/sponsors/ubs.png",                      url:"" },
@@ -316,10 +316,20 @@ const SITE = {
   ],
 
   /* ---- SPIRIT WEAR ----------------------------------------
-     The first store is the wide feature box across the top of
-     the section. Anything listed after it sits underneath at
-     normal card size. Reorder the list to change which one
-     leads.
+     Every store is the same size. The first one in the list
+     comes first on the page and gets the gold top edge, so
+     reorder the list to change which one leads.
+
+     "qr" is optional. Set it to a QR code image and the card
+     gets a "Show QR code" button that opens it full screen, so
+     a parent can scan it and pay on their own phone. The
+     booster shop's QR also opens straight from
+     inglemoorfootball.com/#shop-qr (save that to a phone's
+     home screen).
+
+     IMPORTANT: the QR holds the link itself. If the store's url
+     changes (the Zeffy link has "2025" in it), make a new QR
+     at the same time or it will send people to the old page.
      --------------------------------------------------------- */
   shop: {
     lede: "Wear the gold. Everything here is sold by the boosters or the team, so what you spend comes back to Viking football.",
@@ -327,7 +337,8 @@ const SITE = {
       { t:"Booster shop",
         d:"Hoodies, tees, hats and sideline gear for players, parents and the student section. This is the booster store \u2014 every dollar goes straight back into the program.",
         url:"https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop",
-        cta:"Shop the booster store" },
+        cta:"Shop the booster store",
+        qr:"images/qr/booster-shop.svg" },
 
       { t:"Team gear",
         d:"The team\u2019s custom store, with player and family apparel printed to order.",
@@ -887,6 +898,7 @@ nav a.navgold.active{color:#FFC754}
   text-transform:uppercase;color:var(--gold);text-decoration:none;
   border:1px solid var(--gold-deep);padding:9px 16px;margin-right:10px}
 .cmlink:hover{background:var(--gold);color:var(--ink)}
+.cmlink.hide{display:none}
 
 /* ---------- past seasons ---------- */
 .season{background:var(--panel);border:1px solid var(--line);
@@ -1054,23 +1066,14 @@ table.sched tr:hover td{background:rgba(240,180,41,.03)}
 .card.give .cta{gap:8px}
 .card.give .btn{padding:11px 20px;font-size:14px}
 .card.give.featured{border-top-color:var(--gold)}
-/* Spirit wear: the first store leads across the full width, the rest
-   sit underneath at the usual card size. */
-.shopgrid .card.give.lead{grid-column:1/-1;border-top-color:var(--gold);background:var(--panel2)}
-.shopgrid .card.give.lead h4{font-size:30px}
-.shopgrid .card.give.lead p{max-width:62ch;font-size:15.5px}
-.shopgrid .card.give.lead .btn{padding:14px 26px;font-size:15px}
-@media(min-width:820px){
-  /* wide enough to sit the button beside the copy instead of under it,
-     so the full-width card doesn't leave a dead gap on the right */
-  .shopgrid .card.give.lead{
-    display:grid;grid-template-columns:1fr auto;
-    column-gap:44px;align-items:center;
-  }
-  .shopgrid .card.give.lead h4{grid-column:1;margin-bottom:8px}
-  .shopgrid .card.give.lead p{grid-column:1;margin-bottom:0;flex:none}
-  .shopgrid .card.give.lead .cta{grid-column:2;grid-row:1/3;margin:0}
-}
+/* "Show QR code" sits beside the store button */
+button.btn{cursor:pointer}
+/* the QR pop-up reuses the coach photo pop-up (.lb / .lbin) */
+.qrimg{width:100%;max-width:62vh;height:auto;margin:0 auto 20px;display:block;
+  background:#fff;border-top:2px solid var(--gold);image-rendering:pixelated}
+.qrurl{display:inline-block;margin-top:14px;font-family:var(--cond);font-weight:600;
+  font-size:13px;letter-spacing:.08em;color:var(--mute);text-decoration:none;word-break:break-all}
+.qrurl:hover{color:var(--gold)}
 
 .boardwrap{background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--line2)}
 table.btable{width:100%;border-collapse:collapse}
@@ -1882,19 +1885,69 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     : '';
 
   /* ---- SUPPORT ---- */
-  /* Spirit wear: first store leads at full width, the rest follow. */
+  /* Spirit wear: same-size cards, first store first. */
   (function(){
     const shop = SITE.shop || {};
     const stores = shop.stores || [];
     if (!stores.length){ const sec = document.getElementById("shop"); if (sec) sec.remove(); return; }
     const lede = $("#shopLede"); if (lede) lede.textContent = shop.lede || "";
     $("#shopMount").innerHTML = stores.map((st,i) =>
-      '<div class="card give' + (i === 0 ? " lead" : "") + '">' +
+      '<div class="card give' + (i === 0 ? " featured" : "") + '">' +
         '<h4>'+st.t+'</h4>' +
         '<p>'+st.d+'</p>' +
         '<div class="cta"><a class="btn" href="'+st.url+
-          '" target="_blank" rel="noopener">'+(st.cta || "Open")+'</a></div>' +
+          '" target="_blank" rel="noopener">'+(st.cta || "Open")+'</a>' +
+          (st.qr ? '<button class="btn ghost" data-qr="'+i+'">Show QR code</button>' : '') +
+        '</div>' +
       '</div>').join("");
+
+    /* QR pop-up — big enough to scan from across a table */
+    if (!stores.some(st => st.qr)) return;
+    const lb = document.createElement("div");
+    lb.className = "lb"; lb.setAttribute("role","dialog"); lb.setAttribute("aria-modal","true");
+    lb.innerHTML = '<button class="lbclose" aria-label="Close">Close</button>' +
+      '<div class="lbin"><img class="qrimg" id="qrImg" alt="">' +
+      '<h4 id="qrName"></h4><p>Scan with your phone camera</p>' +
+      '<a class="qrurl" id="qrUrl" target="_blank" rel="noopener"></a></div>';
+    document.body.appendChild(lb);
+
+    let lastFocus = null;
+    function openQr(st){
+      lastFocus = document.activeElement;
+      lb.querySelector("#qrImg").src = st.qr;
+      lb.querySelector("#qrImg").alt = "QR code for the " + st.t.toLowerCase();
+      lb.querySelector("#qrName").textContent = st.t;
+      const a = lb.querySelector("#qrUrl");
+      a.href = st.url;
+      a.textContent = st.url.replace(/^https?:\/\/(www\.)?/, "");
+      lb.classList.add("on");
+      lb.querySelector(".lbclose").focus();
+    }
+    function closeQr(){
+      lb.classList.remove("on");
+      // drop #shop-qr from the address so the link works again next time
+      if (location.hash === "#shop-qr") history.replaceState(null, "", location.pathname + location.search);
+      if (lastFocus) lastFocus.focus();
+    }
+
+    $("#shopMount").addEventListener("click", e => {
+      const b = e.target.closest("[data-qr]"); if (!b) return;
+      openQr(stores[+b.dataset.qr]);
+    });
+    lb.addEventListener("click", e => {
+      if (e.target === lb || e.target.closest(".lbclose")) closeQr();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && lb.classList.contains("on")) closeQr();
+    });
+
+    // inglemoorfootball.com/#shop-qr opens the first store that has a QR
+    const fromLink = () => {
+      if (location.hash !== "#shop-qr") return;
+      const st = stores.find(x => x.qr); if (st) openQr(st);
+    };
+    addEventListener("hashchange", fromLink);
+    fromLink();
   })();
 
   $("#supportGrid").innerHTML = (SITE.support||[]).map(s => {

@@ -2,7 +2,7 @@
 """
 Pull the public IHS Viking Football Google Calendar and write data/events.json.
 
-Run by .github/workflows/calendar.yml three times a day. Standard library
+Run by .github/workflows/calendar.yml every hour, at :17. Standard library
 only, so the workflow needs no pip install and has nothing to go stale.
 
 To change what gets published, edit the settings block below.
