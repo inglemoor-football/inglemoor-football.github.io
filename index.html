@@ -109,8 +109,7 @@ const SITE = {
     instagram:"https://www.instagram.com/inglemoorfootball/",
     facebook: "https://www.facebook.com/ihsvikingfootballboosters/",
     juniors:  "https://www.inglemoorvikings.org/",
-    donate:   "https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055",
-    store:    "https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop"
+    donate:   "https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055"
   },
 
   // Minutes after kickoff that a game still shows as "In progress".
@@ -314,13 +313,28 @@ const SITE = {
       url:"https://www.zeffy.com/en-US/donation-form/075378d9-5861-44b8-88a9-2759636a8055",
       cta:"Donate" },
 
-    { t:"Buy spirit wear",
-      d:"Viking gear for players, parents and the student section. Two stores, and every purchase goes back to the team.",
-      links:[
-        { label:"Booster shop", url:"https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop" },
-        { label:"Team gear",    url:"https://inglemoorvikingsfootball.fusion-brands.com/" }
-      ]}
   ],
+
+  /* ---- SPIRIT WEAR ----------------------------------------
+     The first store is the wide feature box across the top of
+     the section. Anything listed after it sits underneath at
+     normal card size. Reorder the list to change which one
+     leads.
+     --------------------------------------------------------- */
+  shop: {
+    lede: "Wear the gold. Everything here is sold by the boosters or the team, so what you spend comes back to Viking football.",
+    stores: [
+      { t:"Booster shop",
+        d:"Hoodies, tees, hats and sideline gear for players, parents and the student section. This is the booster store \u2014 every dollar goes straight back into the program.",
+        url:"https://www.zeffy.com/en-US/ticketing/2025-viking-booster-shop",
+        cta:"Shop the booster store" },
+
+      { t:"Team gear",
+        d:"The team\u2019s custom store, with player and family apparel printed to order.",
+        url:"https://inglemoorvikingsfootball.fusion-brands.com/",
+        cta:"Browse team gear" }
+    ]
+  },
 
   /* ---- VOLUNTEER ------------------------------------------- */
   volunteer: {
@@ -442,6 +456,7 @@ nav a{
   font-family:var(--cond);font-weight:600;font-size:15px;
   letter-spacing:.09em;text-transform:uppercase;
   text-decoration:none;color:var(--mute);transition:color .18s;
+  white-space:nowrap;                 /* "Spirit Wear" is two words */
 }
 nav a:hover{color:var(--bone)}
 nav a.navgold{color:var(--gold)}
@@ -839,24 +854,35 @@ nav a.navgold.active{color:#FFC754}
   border:1px solid transparent;transition:border-color .15s}
 .commit:hover{border-color:var(--gold)}
 .commit img{width:100%;height:100%;object-fit:cover;display:block}
-.cmyear{position:absolute;top:0;left:0;font-family:var(--cond);font-weight:700;
-  font-size:12px;letter-spacing:.16em;background:var(--gold);color:var(--ink);padding:5px 11px}
-.cmbadge{position:absolute;top:0;right:0;font-family:var(--cond);font-weight:700;
-  font-size:12px;letter-spacing:.18em;background:var(--ink);color:var(--gold);
-  padding:5px 11px;border-left:1px solid var(--gold-deep);border-bottom:1px solid var(--gold-deep)}
-.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 13px 11px;
-  background:linear-gradient(180deg,transparent,rgba(10,11,13,.94) 55%)}
+/* the year and any badge sit inside the caption. They used to be pinned to
+   the corners of the tile, where they landed on whatever the poster already
+   had there — usually a school logo. */
+.cmtags{display:flex;gap:6px;margin-bottom:5px}
+.cmyear{font-family:var(--cond);font-weight:700;font-size:11.5px;letter-spacing:.16em;
+  background:var(--gold);color:var(--ink);padding:4px 9px;line-height:1.1}
+.cmbadge{font-family:var(--cond);font-weight:700;font-size:11.5px;letter-spacing:.18em;
+  background:var(--ink);color:var(--gold);padding:4px 9px;line-height:1.1;
+  border:1px solid var(--gold-deep)}
+.commit figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 12px 11px;
+  background:linear-gradient(180deg,transparent,rgba(10,11,13,.82) 32%,rgba(10,11,13,.96) 62%)}
 .commit figcaption b{display:block;font-family:var(--display);font-weight:800;font-size:19px;
   line-height:1.05;text-transform:uppercase;color:var(--bone)}
-.commit figcaption span{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
+.commit figcaption .cmcol{display:block;font-family:var(--cond);font-weight:600;font-size:12px;
   letter-spacing:.09em;text-transform:uppercase;color:var(--mute);margin-top:2px}
 @media(max-width:700px){
   #commitMount .row{display:block}
-  .commit figcaption{padding:34px 15px 13px}
+  .commit figcaption{padding:32px 14px 13px}
   .commit figcaption b{font-size:22px}
+  /* a stacked poster's caption sits on the panel, so it needs no runway */
+  .commit.stacked figcaption{padding:11px 14px 13px}
 }
 .commit figcaption em{display:block;font-style:normal;font-family:var(--cond);font-weight:700;
   font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold);margin-top:3px}
+/* Phone only: a poster too short to carry the caption on top of it gets
+   the caption on the panel underneath, so none of the artwork is hidden. */
+.commit.stacked{height:auto}
+.commit.stacked img{height:var(--artH);object-fit:contain;background:#0c0d10}
+.commit.stacked figcaption{position:static;padding:11px 13px 13px;background:var(--panel2)}
 .cmlink{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.15em;
   text-transform:uppercase;color:var(--gold);text-decoration:none;
   border:1px solid var(--gold-deep);padding:9px 16px;margin-right:10px}
@@ -1028,6 +1054,23 @@ table.sched tr:hover td{background:rgba(240,180,41,.03)}
 .card.give .cta{gap:8px}
 .card.give .btn{padding:11px 20px;font-size:14px}
 .card.give.featured{border-top-color:var(--gold)}
+/* Spirit wear: the first store leads across the full width, the rest
+   sit underneath at the usual card size. */
+.shopgrid .card.give.lead{grid-column:1/-1;border-top-color:var(--gold);background:var(--panel2)}
+.shopgrid .card.give.lead h4{font-size:30px}
+.shopgrid .card.give.lead p{max-width:62ch;font-size:15.5px}
+.shopgrid .card.give.lead .btn{padding:14px 26px;font-size:15px}
+@media(min-width:820px){
+  /* wide enough to sit the button beside the copy instead of under it,
+     so the full-width card doesn't leave a dead gap on the right */
+  .shopgrid .card.give.lead{
+    display:grid;grid-template-columns:1fr auto;
+    column-gap:44px;align-items:center;
+  }
+  .shopgrid .card.give.lead h4{grid-column:1;margin-bottom:8px}
+  .shopgrid .card.give.lead p{grid-column:1;margin-bottom:0;flex:none}
+  .shopgrid .card.give.lead .cta{grid-column:2;grid-row:1/3;margin:0}
+}
 
 .boardwrap{background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--line2)}
 table.btable{width:100%;border-collapse:collapse}
@@ -1136,6 +1179,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     </a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav id="nav">
+      <a href="#shop">Spirit Wear</a>
       <a href="#donate" class="navgold">Donate</a>
       <a href="#volunteer">Volunteer</a>
       <a href="#schedule">Schedule</a>
@@ -1168,6 +1212,16 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <div class="cta" id="heroCta"></div>
       </div>
       <div class="heroshot" id="heroShot"></div>
+    </div>
+  </section>
+
+  <!-- SPIRIT WEAR -->
+  <section id="shop">
+    <div class="wrap">
+      <p class="eyebrow">Gear up</p>
+      <h2 class="sec">Spirit Wear</h2>
+      <p class="lede" id="shopLede"></p>
+      <div class="cards shopgrid" id="shopMount"></div>
     </div>
   </section>
 
@@ -1828,6 +1882,21 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     : '';
 
   /* ---- SUPPORT ---- */
+  /* Spirit wear: first store leads at full width, the rest follow. */
+  (function(){
+    const shop = SITE.shop || {};
+    const stores = shop.stores || [];
+    if (!stores.length){ const sec = document.getElementById("shop"); if (sec) sec.remove(); return; }
+    const lede = $("#shopLede"); if (lede) lede.textContent = shop.lede || "";
+    $("#shopMount").innerHTML = stores.map((st,i) =>
+      '<div class="card give' + (i === 0 ? " lead" : "") + '">' +
+        '<h4>'+st.t+'</h4>' +
+        '<p>'+st.d+'</p>' +
+        '<div class="cta"><a class="btn" href="'+st.url+
+          '" target="_blank" rel="noopener">'+(st.cta || "Open")+'</a></div>' +
+      '</div>').join("");
+  })();
+
   $("#supportGrid").innerHTML = (SITE.support||[]).map(s => {
     const links = s.links && s.links.length
       ? s.links
@@ -1843,7 +1912,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   }).join("");
 
   $("#donateLede").textContent =
-    "Booster dues, donations and spirit wear all run through Zeffy. Every dollar goes back into the program. " +
+    "Booster dues and donations both run through Zeffy. Every dollar goes back into the program. " +
     SITE.boosters.legalName + " is a " + SITE.boosters.status.toLowerCase() +
     ", and all booster dues and donations are 100% tax deductible.";
 
@@ -2059,16 +2128,23 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           const div = document.createElement("div");
           div.className = "row";
           const fig = document.createElement("figure");
-          fig.className = "commit";
+          // A very wide poster ends up too short at phone width for the
+          // caption to sit on top of it without covering the whole thing,
+          // so those get the caption underneath instead.
+          const artH = Math.round(W / c.r);
+          const stacked = artH < 190;
+          fig.className = "commit" + (stacked ? " stacked" : "");
           fig.style.width = W + "px";
-          fig.style.height = Math.round(W / c.r) + "px";
+          fig.style.height = stacked ? "auto" : artH + "px";
+          if (stacked) fig.style.setProperty("--artH", artH + "px");
           fig.dataset.i = i;
           fig.innerHTML =
             '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
-            '<span class="cmyear">'+c.year+'</span>' +
-            (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') +
-            '<figcaption><b>'+c.name+'</b>' +
-              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+            '<figcaption>' +
+              '<span class="cmtags"><span class="cmyear">'+c.year+'</span>' +
+                (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') + '</span>' +
+              '<b>'+c.name+'</b>' +
+              '<span class="cmcol">'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
               (c.note ? '<em>'+c.note+'</em>' : '') +
             '</figcaption>';
           div.appendChild(fig);
@@ -2100,8 +2176,10 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       if (stranded(plan)){
         outer:
         for (let d = 2; d <= 60; d += 2){
-          for (const h of [target - d, target + d]){
-            if (h < 175 || h > 280) continue;
+          // try the taller option first — bigger posters always read better,
+          // and a short row height squeezes the caption onto the artwork
+          for (const h of [target + d, target - d]){
+            if (h < 200 || h > 300) continue;
             const alt = packAt(h);
             if (!stranded(alt)){ H = h; plan = alt; break outer; }
           }
@@ -2120,10 +2198,11 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           fig.dataset.i = c.i;
           fig.innerHTML =
             '<img src="'+c.art+'" alt="'+c.name+' commits to '+c.college+'" loading="lazy">' +
-            '<span class="cmyear">'+c.year+'</span>' +
-            (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') +
-            '<figcaption><b>'+c.name+'</b>' +
-              '<span>'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
+            '<figcaption>' +
+              '<span class="cmtags"><span class="cmyear">'+c.year+'</span>' +
+                (c.badge ? '<span class="cmbadge">'+c.badge+'</span>' : '') + '</span>' +
+              '<b>'+c.name+'</b>' +
+              '<span class="cmcol">'+c.college+(c.position ? ' · '+c.position : '')+'</span>' +
               (c.note ? '<em>'+c.note+'</em>' : '') +
             '</figcaption>';
           div.appendChild(fig);
