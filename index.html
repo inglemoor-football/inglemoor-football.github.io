@@ -252,11 +252,12 @@ const SITE = {
     { year:2025, name:"Brandon Henkens", college:"University of Puget Sound",      position:"DL",    art:"images/committed/henkens.jpg" },
     { year:2024, name:"Will Frank",      college:"Pacific Lutheran University",    position:"QB/CB", art:"images/committed/frank.jpg" },
     { year:2024, name:"Matteus Senna",   college:"University of Montana Western",  position:"WR/S",  art:"images/committed/senna.jpg" },
+    { year:2024, name:"Christian Solomona", college:"Central Washington University", position:"LB",    art:"images/committed/solomona.jpg" },
     { year:2020, name:"Trevor Thurman",  college:"Eastern Washington University",  position:"DE",    art:"images/committed/thurman.jpg" },
     { year:2019, name:"Quentin Moore",   college:"University of Washington",       position:"TE",    art:"images/committed/moore.jpg",
       badge:"NFL", note:"Signed with the Washington Commanders",
       link:"https://www.instagram.com/p/Dc6kKRilFlT/" },
-    { year:2019, name:"Braden Dick",     college:"Pacific Lutheran University",    position:"OL",    art:"images/committed/dick.jpg" },
+    { year:2019, name:"Braden Dick",     college:"Pacific Lutheran University",    position:"DL",    art:"images/committed/dick.jpg" },
     { year:2017, name:"Max Larson",      college:"Pacific Lutheran University",    position:"DE",    art:"images/committed/larson.jpg" }
   ],
 
@@ -282,7 +283,7 @@ const SITE = {
     { name:"Clements Orthodontics",    tier:"bronze", logo:"images/sponsors/clements-orthodontics.png",    url:"" },
     { name:"Eubanks Law",              tier:"bronze", logo:"images/sponsors/eubanks-law.png",              url:"" },
     { name:"Jessica's Unique Bite",    tier:"bronze", logo:"images/sponsors/jessicas-unique-bite.png",     url:"" },
-    { name:"Kenmore Self Storage",     tier:"bronze", logo:"images/sponsors/kenmore-self-storage.png",     url:"" },
+    { name:"Kenmore Self Storage",     tier:"bronze", logo:"images/sponsors/kenmore-self-storage.jpg" ,     url:"" },
     { name:"La Corona Cocina Cantina", tier:"bronze", logo:"images/sponsors/la-corona.png",                url:"" },
     { name:"Minahan Dental",           tier:"bronze", logo:"images/sponsors/minahan-dental.png",           url:"" },
     { name:"Ostrom's Drug & Gift",     tier:"bronze", logo:"images/sponsors/ostroms-drug.png",             url:"" },
@@ -2079,16 +2080,34 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       // Every tile is the same height, full stop. Rows are packed to fit and
       // then centred — justifying rows to the page edge is what made some
       // posters look more important than others.
-      const H = target;
-      const plan = []; let row = [], used = 0;
-      shots.forEach((c,i) => {
-        c.i = i;
-        const wpx = H * c.r;
-        const next = used ? used + gap + wpx : wpx;
-        if (row.length && next > W){ plan.push(row); row = [c]; used = wpx; }
-        else { row.push(c); used = next; }
-      });
-      if (row.length) plan.push(row);
+      const packAt = h => {
+        const rows = []; let row = [], used = 0;
+        shots.forEach(c => {
+          const wpx = h * c.r;
+          const next = used ? used + gap + wpx : wpx;
+          if (row.length && next > W){ rows.push(row); row = [c]; used = wpx; }
+          else { row.push(c); used = next; }
+        });
+        if (row.length) rows.push(row);
+        return rows;
+      };
+
+      // A single poster stranded on the last row looks like a mistake, so
+      // nudge the row height until the set packs evenly. Keeps working as
+      // athletes are added rather than needing a hand-tuned number.
+      let H = target, plan = packAt(H);
+      const stranded = p => p.length > 1 && p[p.length-1].length === 1;
+      if (stranded(plan)){
+        outer:
+        for (let d = 2; d <= 60; d += 2){
+          for (const h of [target - d, target + d]){
+            if (h < 175 || h > 280) continue;
+            const alt = packAt(h);
+            if (!stranded(alt)){ H = h; plan = alt; break outer; }
+          }
+        }
+      }
+      shots.forEach((c,i) => { c.i = i; });
 
       plan.forEach(r => {
         const div = document.createElement("div");
