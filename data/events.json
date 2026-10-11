@@ -1,13 +1,7 @@
 {
- "updated": "2026-10-10T18:51:39-07:00",
+ "updated": "2026-10-11T01:47:56-07:00",
  "windowDays": 180,
  "events": [
-  {
-   "start": "2026-10-10T10:00:00-07:00",
-   "allDay": false,
-   "title": "C-team practice",
-   "location": ""
-  },
   {
    "start": "2026-10-12T16:00:00-07:00",
    "allDay": false,
