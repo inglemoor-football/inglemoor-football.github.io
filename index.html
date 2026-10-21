@@ -57,13 +57,21 @@ const SITE = {
   },
 
   /* ---- PHOTOS ----------------------------------------------
-     Photos and video live in Cloudflare R2 and are uploaded
-     from admin.html. Nothing to edit here — the site asks the
-     Worker what exists and builds the gallery from that.
+     Photos and video normally live in Cloudflare R2 and are
+     uploaded from admin.html. The site asks the Worker what
+     exists and builds the gallery from that.
+
+     Photos can also sit in this repository, in images/games/
+     (one folder per game date, with a thumbs/ folder inside),
+     listed in images/games/photos.json. Both sources show
+     together on the same game. Repo photos can't be removed
+     from the admin page — delete the file and its line in
+     photos.json instead.
      --------------------------------------------------------- */
   photos: {
     show: true,
     worker: "https://inglemoor-scores.grahamcomley.workers.dev",
+    local: "images/games/photos.json",
     credit: ""
   },
 
@@ -2010,6 +2018,18 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       }
     } catch(e){}
 
+    // photos kept in the repo (images/games/), added on top of the Worker's
+    const wcounts = Object.assign({}, counts);
+    let local = {};
+    if (cfg.local){
+      try {
+        const r = await fetch(cfg.local, { cache:"no-store" });
+        if (r.ok) local = await r.json();
+      } catch(e){}
+    }
+    const localBase = (cfg.local || "").replace(/[^\/]*$/, "");
+    Object.keys(local).forEach(d => { counts[d] = (counts[d] || 0) + (local[d] || []).length; });
+
     // only games that actually have photos
     const withPhotos = games.filter(g => !g.tbd && counts[g.date] > 0);
     if (!withPhotos.length){
@@ -2056,7 +2076,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           t.dataset.i = s.i;
           t.innerHTML = s.video
             ? '<span class="ph">Video</span>'
-            : '<img src="'+api({action:"img",key:s.thumb})+'" alt="" loading="lazy">';
+            : '<img src="'+s.tsrc+'" alt="" loading="lazy">';
           div.appendChild(t);
         });
         wrap.appendChild(div);
@@ -2084,14 +2104,22 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       active = k;
       $("#phPills").querySelectorAll(".pill").forEach((p,i) => p.setAttribute("aria-pressed", i===k));
       $("#phGrid").innerHTML = '<p class="credit">Loading…</p>';
-      try {
-        const r = await fetch(api({action:"list", game: withPhotos[k].date}));
-        const d = await r.json();
-        shots = (d.files||[]).map(f => ({
-          key:f.key, thumb:f.thumb, video:f.video,
-          r: (f.w && f.h) ? (f.w/f.h) : 1.5
-        }));
-      } catch(e){ shots = []; }
+      const date = withPhotos[k].date;
+      shots = [];
+      if (wcounts[date]){
+        try {
+          const r = await fetch(api({action:"list", game: date}));
+          const d = await r.json();
+          shots = (d.files||[]).map(f => ({
+            src: api({action:"img",key:f.key}), tsrc: api({action:"img",key:f.thumb}),
+            video:f.video, r: (f.w && f.h) ? (f.w/f.h) : 1.5
+          }));
+        } catch(e){}
+      }
+      (local[date] || []).forEach(f => shots.push({
+        src: localBase + date + "/" + f.f, tsrc: localBase + date + "/thumbs/" + f.f,
+        video:false, r: (f.w && f.h) ? (f.w/f.h) : 1.5
+      }));
       layout();
     }
 
@@ -2118,8 +2146,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       at = (i + shots.length) % shots.length;
       const s = shots[at];
       lb.querySelector("#plbBox").innerHTML = s.video
-        ? '<video src="'+api({action:"img",key:s.key})+'" controls autoplay playsinline></video>'
-        : '<img src="'+api({action:"img",key:s.key})+'" alt="">';
+        ? '<video src="'+s.src+'" controls autoplay playsinline></video>'
+        : '<img src="'+s.src+'" alt="">';
       lb.querySelector("#plbMeta").textContent =
         (withPhotos[active].home?"vs ":"at ") + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
       lb.classList.add("on");

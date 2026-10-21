@@ -184,6 +184,16 @@ instead (the `.stacked` variant).
 **Photos** — justified grid, fixed row heights, centred rows. Images resize
 in the browser before upload (canvas: 2200px display + 900px thumbnail).
 
+**Photos in the repo (v0.9.41)** — photos can also live in git under
+`images/games/<date>/` (2200px) and `images/games/<date>/thumbs/` (900px),
+listed in `images/games/photos.json` as `{"f":..., "w":..., "h":...}`. The
+gallery shows Worker (R2) photos and repo photos together for the same game,
+and still works if the Worker is down. Added Oct 21 2026 when Graham couldn't
+use the admin page and the sandbox can't reach the Worker. The admin page
+can't see or remove repo photos — delete the file, its thumb and its line in
+photos.json. Resize to match the admin page: longest side 2200 / 900, JPEG
+q88, EXIF orientation applied.
+
 **Spirit Wear** — every store card is the same size (v0.9.40 dropped the
 double-width lead card; Graham said it looked bad). The first store in
 `SITE.shop.stores` comes first and gets the gold top edge.
