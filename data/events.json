@@ -1,19 +1,7 @@
 {
- "updated": "2026-10-22T18:29:30-07:00",
+ "updated": "2026-10-23T00:29:38-07:00",
  "windowDays": 180,
  "events": [
-  {
-   "start": "2026-10-22T16:00:00-07:00",
-   "allDay": false,
-   "title": "Team Practice",
-   "location": ""
-  },
-  {
-   "start": "2026-10-22T18:30:00-07:00",
-   "allDay": false,
-   "title": "Team Dinner",
-   "location": ""
-  },
   {
    "start": "2026-10-23T16:00:00-07:00",
    "allDay": false,
