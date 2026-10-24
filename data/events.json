@@ -1,13 +1,7 @@
 {
- "updated": "2026-10-23T22:50:25-07:00",
+ "updated": "2026-10-24T03:56:43-07:00",
  "windowDays": 180,
  "events": [
-  {
-   "start": "2026-10-23T16:00:00-07:00",
-   "allDay": false,
-   "title": "Team Practice",
-   "location": ""
-  },
   {
    "start": "2026-10-24T10:00:00-07:00",
    "allDay": false,
