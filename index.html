@@ -1540,12 +1540,25 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       tickTock(); setInterval(tickTock, 1000);
     }
   } else {
-    $("#heroWeek").innerHTML = '<span class="dot"></span>' + SITE.team.season + ' season complete';
-    $("#heroMatchup").innerHTML =
-      '<span class="us">Inglemoor</span><span class="vs">finished</span><span class="them">' + W + '–' + L + '</span>';
-    $("#heroFacts").innerHTML = '<span>Thank you, Viking families</span>';
-    $("#clock").remove();
-    $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the season</a>';
+    // Regular season over but a playoff game is still to be set (tbd:true
+    // in the schedule) — say so, rather than calling the season complete.
+    const playoff = games.find(g => g.tbd);
+    if (playoff){
+      $("#heroWeek").innerHTML = '<span class="dot"></span>' + SITE.team.season +
+        ' regular season complete<span class="dot"></span>Playoffs next';
+      $("#heroMatchup").innerHTML =
+        '<span class="us">Inglemoor</span><span class="vs">regular season</span><span class="them">' + recStr + '</span>';
+      $("#heroFacts").innerHTML = '<span>' + (playoff.note || "Playoff opponent, date and site to be announced") + '</span>';
+      $("#clock").remove();
+      $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the schedule</a>';
+    } else {
+      $("#heroWeek").innerHTML = '<span class="dot"></span>' + SITE.team.season + ' season complete';
+      $("#heroMatchup").innerHTML =
+        '<span class="us">Inglemoor</span><span class="vs">finished</span><span class="them">' + recStr + '</span>';
+      $("#heroFacts").innerHTML = '<span>Thank you, Viking families</span>';
+      $("#clock").remove();
+      $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the season</a>';
+    }
   }
 
   /* ---- PREVIEW BANNER ---- */
