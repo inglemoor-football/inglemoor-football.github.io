@@ -1544,8 +1544,9 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     // in the schedule) — say so, rather than calling the season complete.
     const playoff = games.find(g => g.tbd);
     if (playoff){
-      $("#heroWeek").innerHTML = '<span class="dot"></span>' + SITE.team.season +
-        ' regular season complete<span class="dot"></span>Playoffs next';
+      // the second dot travels with its words, so a wrap never strands it
+      $("#heroWeek").innerHTML = '<span class="dot"></span>Regular season complete' +
+        '<span style="display:inline-flex;align-items:center;gap:16px"><span class="dot"></span>Playoffs next</span>';
       $("#heroMatchup").innerHTML =
         '<span class="us">Inglemoor</span><span class="vs">regular season</span><span class="them">' + recStr + '</span>';
       $("#heroFacts").innerHTML = '<span>' + (playoff.note || "Playoff opponent, date and site to be announced") + '</span>';
