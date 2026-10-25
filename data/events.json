@@ -1,19 +1,7 @@
 {
- "updated": "2026-10-24T23:05:57-07:00",
+ "updated": "2026-10-25T04:24:01-07:00",
  "windowDays": 180,
  "events": [
-  {
-   "start": "2026-10-24T10:00:00-07:00",
-   "allDay": false,
-   "title": "All team practice",
-   "location": ""
-  },
-  {
-   "start": "2026-10-24T19:00:00-07:00",
-   "allDay": false,
-   "title": "Varsity Game vs. Liberty",
-   "location": "Pop Keeney Stadium, 9809 NE 188th St, Bothell, WA 98011, USA"
-  },
   {
    "start": "2026-10-26T16:00:00-07:00",
    "allDay": false,
