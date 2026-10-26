@@ -126,8 +126,12 @@ const SITE = {
 
   /* ---- SCHEDULE -------------------------------------------
      date  : "YYYY-MM-DD" and time in 24h "HH:MM"
-     at    : "home" or "away"
+     at    : "home", "away" or "neutral"
+     site  : for neutral games, where it's played
      league: true if it counts toward the league standings
+     round : optional label for the top of the site instead of
+             "Game 9 of 10", e.g. "Playoffs · Play-in round"
+     approx: true if the kickoff time is only approximate
      Add us/them once the game is played:  us: 28, them: 14
      --------------------------------------------------------- */
   schedule: [
@@ -139,6 +143,7 @@ const SITE = {
     { date:"2026-10-09", time:"19:00", opp:"Redmond",          abbr:"RED", at:"away", league:true, us:56, them:14  },
     { date:"2026-10-16", time:"19:00", opp:"Lake Washington",  abbr:"LWA", at:"away", league:false, us:21, them:6 },
     { date:"2026-10-24", time:"19:00", opp:"Liberty",          abbr:"LIB", at:"home", league:false, us:10, them:3 },
+    { date:"2026-10-27", time:"20:00", opp:"Mercer Island or Liberty", abbr:"PI", at:"neutral", site:"Issaquah High School", league:false, round:"Playoffs · Play-in round", approx:true },
 
     // Playoff placeholder. Leave tbd:true until seeding is announced —
     // it shows as TBD and stays out of the countdown. When you know the
@@ -1268,7 +1273,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         <div>
           <p class="eyebrow">Full schedule</p>
           <h2 class="sec">Dates &amp; results</h2>
-          <p class="lede">All kickoffs 7:00 PM. Home games are played at Pop Keeney Stadium in Bothell.</p>
+          <p class="lede">Kickoffs 7:00 PM unless noted. Home games are played at Pop Keeney Stadium in Bothell.</p>
         </div>
         <div class="recbox">
           <span class="rn" id="recBig"></span>
@@ -1415,6 +1420,8 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       won: played ? g.us > g.them : null,
       tie: played ? g.us === g.them : false,
       home: g.at === "home",
+      neutral: g.at === "neutral",
+      vs: g.at === "away" ? "at " : "vs ",          // "vs" for home and neutral games
       tbd: false
     });
   }).sort((a,b) => {
@@ -1463,15 +1470,19 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   if (feature) {
     const next = feature;                 // hero speaks about this game
     const wk = next.i + 1;
-    $("#heroWeek").innerHTML =
-      '<span class="dot"></span>' + (feature.live ? "Playing now" : "Next up") +
-      ' · Game ' + wk + ' of ' + games.length +
-      '<span class="dot"></span>' + SITE.team.league + ' ' + SITE.team.class +
-      (next.league ? '<span class="dot"></span>League game' : '');
+    // each piece keeps its dot with it, so wrapping on a phone never
+    // leaves a dot stranded on its own
+    const piece = t => '<span style="display:inline-flex;align-items:center;gap:16px">' +
+      '<span class="dot"></span>' + t + '</span>';
+    $("#heroWeek").innerHTML = next.round
+      ? [feature.live ? "Playing now" : "Next up"].concat(next.round.split(" · ")).map(piece).join("")
+      : piece((feature.live ? "Playing now" : "Next up") + ' · Game ' + wk + ' of ' + games.length) +
+        piece(SITE.team.league + ' ' + SITE.team.class) +
+        (next.league ? piece("League game") : '');
 
     $("#heroMatchup").innerHTML =
       '<span class="us">Inglemoor</span>' +
-      '<span class="vs">' + (next.home ? "hosts" : "travels to") + '</span>' +
+      '<span class="vs">' + (next.neutral ? "vs" : next.home ? "hosts" : "travels to") + '</span>' +
       '<span class="them">' + next.opp + '</span>';
 
     (function(){
@@ -1488,7 +1499,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
           '<span class="v ' + (lastGame.tie ? "t" : lastGame.won ? "w" : "l") + '">' +
             (lastGame.tie ? "T " : lastGame.won ? "W " : "L ") +
             lastGame.us + "–" + lastGame.them + '</span>' +
-          '<small>' + (lastGame.home ? "vs " : "at ") + lastGame.opp + ' · ' +
+          '<small>' + lastGame.vs + lastGame.opp + ' · ' +
             MON[lastGame.when.getMonth()] + ' ' + lastGame.when.getDate() + '</small></div>');
       } else if (games[0]) {
         cells.push(
@@ -1501,8 +1512,9 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
 
     $("#heroFacts").innerHTML =
       '<span>' + fmtDate(next.when) + '</span>' +
-      '<span>' + fmtTime(next.when) + ' kickoff</span>' +
-      '<span>' + (next.home ? SITE.homeField.name : "At " + next.opp) + '</span>';
+      '<span>' + (next.approx ? "About " : "") + fmtTime(next.when) + ' kickoff</span>' +
+      '<span>' + (next.neutral ? (next.site || "Neutral site")
+                 : next.home ? SITE.homeField.name : "At " + next.opp) + '</span>';
 
     const cta = [];
     if (SITE.links.tickets) cta.push('<a class="btn" href="'+SITE.links.tickets+'" target="_blank" rel="noopener">Buy tickets</a>');
@@ -1542,13 +1554,35 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
   } else {
     // Regular season over but a playoff game is still to be set (tbd:true
     // in the schedule) — say so, rather than calling the season complete.
-    const playoff = games.find(g => g.tbd);
+    // Game over but no score posted yet, and nothing else scheduled:
+    // keep talking about that game until the score goes in.
+    const pending = games.filter(g => g.awaiting).pop();
+    if (pending){
+      $("#heroWeek").innerHTML = '<span class="dot"></span>' + (pending.round || "Last game") +
+        '<span style="display:inline-flex;align-items:center;gap:16px"><span class="dot"></span>Final · score pending</span>';
+      $("#heroMatchup").innerHTML =
+        '<span class="us">Inglemoor</span><span class="vs">' + (pending.neutral ? "vs" : pending.home ? "hosted" : "at") + '</span>' +
+        '<span class="them">' + pending.opp + '</span>';
+      $("#heroFacts").innerHTML = '<span>' + fmtDate(pending.when) + '</span>' +
+        '<span>' + (pending.neutral ? (pending.site || "Neutral site") : pending.home ? SITE.homeField.name : "At " + pending.opp) + '</span>';
+      $("#clock").remove();
+      $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the schedule</a>';
+    } else {
+    // After a playoff game: a win keeps "next round" showing, a loss ends
+    // the season — so nobody has to edit anything on game night.
+    const playoffsPlayed = done.filter(g => g.round);
+    const lastPlayoff = playoffsPlayed[playoffsPlayed.length - 1];
+    const playoff = (!lastPlayoff || lastPlayoff.won) ? games.find(g => g.tbd) : null;
     if (playoff){
       // the second dot travels with its words, so a wrap never strands it
-      $("#heroWeek").innerHTML = '<span class="dot"></span>Regular season complete' +
-        '<span style="display:inline-flex;align-items:center;gap:16px"><span class="dot"></span>Playoffs next</span>';
+      $("#heroWeek").innerHTML = lastPlayoff
+        ? '<span class="dot"></span>Playoffs' +
+          '<span style="display:inline-flex;align-items:center;gap:16px"><span class="dot"></span>Next round to be announced</span>'
+        : '<span class="dot"></span>Regular season complete' +
+          '<span style="display:inline-flex;align-items:center;gap:16px"><span class="dot"></span>Playoffs next</span>';
       $("#heroMatchup").innerHTML =
-        '<span class="us">Inglemoor</span><span class="vs">regular season</span><span class="them">' + recStr + '</span>';
+        '<span class="us">Inglemoor</span><span class="vs">' + (lastPlayoff ? "this season" : "regular season") +
+        '</span><span class="them">' + recStr + '</span>';
       $("#heroFacts").innerHTML = '<span>' + (playoff.note || "Playoff opponent, date and site to be announced") + '</span>';
       $("#clock").remove();
       $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the schedule</a>';
@@ -1559,6 +1593,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       $("#heroFacts").innerHTML = '<span>Thank you, Viking families</span>';
       $("#clock").remove();
       $("#heroCta").innerHTML = '<a class="btn ghost" href="#schedule">See the season</a>';
+    }
     }
   }
 
@@ -1590,7 +1625,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     else if (g.live) res = '<span class="tag live"><i></i>In progress</span>';
     else if (g.awaiting) res = '<span class="res p">Final &middot; score pending</span>';
     else if (next && g.i === next.i) res = '<span class="tag">Next up</span>';
-    else res = '<span class="res p">'+fmtTime(g.when)+'</span>';
+    else res = '<span class="res p">'+(g.approx ? "About " : "")+fmtTime(g.when)+'</span>';
 
     // played games leave this cell empty unless there are photos, which the
     // photos section fills in later — no sending people off to another site
@@ -1599,9 +1634,10 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
       : (SITE.links.stream ? '<a class="mini" href="'+SITE.links.stream+'" target="_blank" rel="noopener">Watch</a>' : "");
 
     return '<tr>' +
-      '<td class="dt">' + fmtDate(g.when) + '<small>' + (g.league ? "League" : "Non-league") + '</small></td>' +
-      '<td class="opp">' + (g.home ? "" : "at ") + g.opp +
-        '<em>' + (g.home ? SITE.homeField.name : "Away") + '</em></td>' +
+      '<td class="dt">' + fmtDate(g.when) + '<small>' + (g.round ? "Playoffs" : g.league ? "League" : "Non-league") + '</small></td>' +
+      '<td class="opp">' + (g.at === "away" ? "at " : "") + g.opp +
+        '<em>' + (g.neutral ? (g.site || "Neutral site") + " · Neutral site"
+                 : g.home ? SITE.homeField.name : "Away") + '</em></td>' +
       '<td>' + res + '</td>' +
       '<td style="text-align:right">' + watch + '</td>' +
     '</tr>';
@@ -2056,7 +2092,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
     $("#phLede").textContent = "Game by game, through the season.";
     $("#phPills").innerHTML = withPhotos.map((g,i) =>
       '<button class="pill" aria-pressed="'+(i===0)+'" data-i="'+i+'">' +
-        '<span class="p1">' + (g.home ? "vs " : "at ") + g.opp + '</span>' +
+        '<span class="p1">' + g.vs + g.opp + '</span>' +
         '<span class="p2">' + MON[g.when.getMonth()] + ' ' + g.when.getDate() +
           ' · ' + counts[g.date] + '</span>' +
       '</button>').join("");
@@ -2163,7 +2199,7 @@ footer .addr{color:var(--mute);font-size:15px;line-height:1.7}
         ? '<video src="'+s.src+'" controls autoplay playsinline></video>'
         : '<img src="'+s.src+'" alt="">';
       lb.querySelector("#plbMeta").textContent =
-        (withPhotos[active].home?"vs ":"at ") + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
+        withPhotos[active].vs + withPhotos[active].opp + " · " + (at+1) + " of " + shots.length;
       lb.classList.add("on");
     }
     const close = () => { lb.classList.remove("on"); lb.querySelector("#plbBox").innerHTML = ""; };

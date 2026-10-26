@@ -184,6 +184,20 @@ instead (the `.stacked` variant).
 **Photos** — justified grid, fixed row heights, centred rows. Images resize
 in the browser before upload (canvas: 2200px display + 900px thumbnail).
 
+**Playoff games (v0.9.45)** — a schedule line can carry `at:"neutral"` with
+`site:"..."`, `round:"Playoffs · Play-in round"` (replaces "Game X of Y" in
+the hero and shows "Playoffs" in the schedule) and `approx:true` ("About 8:00
+PM kickoff"). With no next game the hero picks itself: a finished game with
+no score yet shows "Final · score pending"; after a playoff win, or before any
+playoff game, a `tbd:true` line shows "Playoffs next"; after a playoff loss it
+shows "Season complete". Nobody needs to edit anything on game night.
+
+**Pushing directly** — from Oct 21 2026 the Claude GitHub App is installed on
+the org and Claude pushes straight to main when Graham asks (he's often on his
+phone). Always `git fetch` and rebase onto origin/main first (score posts and
+the calendar commit constantly), test, then push. Graham then does Fetch/Pull
+in GitHub Desktop before his next zip deploy.
+
 **Photos in the repo (v0.9.41)** — photos can also live in git under
 `images/games/<date>/` (2200px) and `images/games/<date>/thumbs/` (900px),
 listed in `images/games/photos.json` as `{"f":..., "w":..., "h":...}`. The
