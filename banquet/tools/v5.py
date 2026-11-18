@@ -91,14 +91,17 @@ BG="BLACK & GOLD CHARITY NIGHT  ·  AUG 21"
 BLACKGOLD=[QQ("0022","8538"),Q("3472"),QQ("0027","8546"),Q("8526")]
 COUNTDOWN=[Q("7891","PRESEASON  ·  AUG 29"),Q("7910","PRESEASON  ·  AUG 29"),Q("7942","PRESEASON  ·  AUG 29"),
            Q("4980","TEAM DINNER  ·  NIGHT BEFORE GAME 1"),Q("4983","TEAM DINNER  ·  NIGHT BEFORE GAME 1"),Q("0567","TEAM DINNER  ·  NIGHT BEFORE GAME 1")]
-CTEAM=[QQ("1067","1151"),QQ("1184","1272"),QQ("1282","1395")]
+B4=lambda num:_g.glob(f"{S}/batch4/raw/IMG_{num} *")[0]   # C Team, Nov 18
+CTEAM=[QQ("1067","1151"),QQ("1184","1272"),QQ("1282","1395"),
+       ("pair",[B4("1289"),B4("1284")],None),("pair",[B4("1361"),B4("1368")],None),
+       ("pair",[B4("1356"),B4("1174")],None),("photo",[B4("1384")],None)]
 B3=lambda key:_g.glob(f"{S}/batch3/raw/Photo {key}*")[0]            # batch 3 (Nov 11), by timestamp
 R=lambda key,tag=None:("photo",[B3(key)],tag)
 V3=lambda key:_g.glob(f"{S}/batch3/raw/Video {key}*")[0]
 PRE={"2026-09-05":[R("Sep 05 2026, 6 48 30")],                                   # A2 pregame
      "2026-09-18":[("video",[V3("Sep 18 2026, 6 52 40"),11.0,12.0]),R("Sep 18 2026, 6 54 55")],  # V8 walk-out, A19
      "2026-10-02":[Q("7093","GAME DAY  ·  OCT 2")]}
-ADD3={"2026-09-05":[R("Sep 05 2026, 9 36 37"),("video",[V3("Sep 05 2026, 9 37 07"),1.0,9.0])],  # A14, V6
+ADD3={"2026-09-05":[R("Sep 05 2026, 9 36 37")],  # A14 (V6 talking clip removed, Graham Nov 11)
       "2026-09-11":[R("Sep 11 2026, 6 09 04 PM (1)")],                          # A17
       "2026-09-18":[R("Sep 18 2026, 7 03 54"),R("Sep 18 2026, 7 38 40"),R("Sep 18 2026, 8 02 48"),R("Sep 18 2026, 8 41 39")],  # A21 A22 B2 B3
       "2026-10-02":[R("Oct 03 2026, 12 52 37")],                                # B11
